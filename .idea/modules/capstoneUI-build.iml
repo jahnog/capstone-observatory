@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="capstoneUI-build" external.linked.project.path="$MODULE_DIR$/../../capstone-ui/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="SUB:DOLLAR78d87124cb7fb0a1b8c6.capstoneUI, StudentBuild._, _root_.com.typesafe.sbteclipse.plugin.EclipsePlugin.autoImport._, _root_.org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._, _root_.coursier.CoursierPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.com.typesafe.sbteclipse.plugin.EclipsePlugin, _root_.org.scalajs.sbtplugin.ScalaJSJUnitPlugin, _root_.org.scalajs.sbtplugin.ScalaJSPlugin, _root_.coursier.CoursierPlugin, sbt._, Keys._, dsl._" sbt.resolvers="file:$USER_HOME$/.sbt/preloaded/|maven|local-preloaded, https://repo1.maven.org/maven2/|maven|public, /home/javier/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
+<module external.linked.project.id="capstoneUI-build" external.linked.project.path="$MODULE_DIR$/../../capstone-ui/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="SUB:DOLLAR7beb1e40d438c443ecf9.capstoneUI, StudentBuild._, _root_.com.typesafe.sbteclipse.plugin.EclipsePlugin.autoImport._, _root_.org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._, _root_.coursier.CoursierPlugin.autoImport._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.com.typesafe.sbteclipse.plugin.EclipsePlugin, _root_.org.scalajs.sbtplugin.ScalaJSJUnitPlugin, _root_.org.scalajs.sbtplugin.ScalaJSPlugin, _root_.coursier.CoursierPlugin, sbt._, Keys._, dsl._" sbt.resolvers="file:/$USER_HOME$/.sbt/preloaded|maven|local-preloaded, https://repo1.maven.org/maven2/|maven|public, C:\Users\javier.h.nogueira\.ivy2\cache|ivy|Local cache" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/../../capstone-ui/project/target/idea-classes" />
     <output-test url="file://$MODULE_DIR$/../../capstone-ui/project/target/idea-test-classes" />
@@ -34,6 +34,7 @@
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-js-envs_2.10/jars/scalajs-js-envs_2.10-0.6.11.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-sbt-test-adapter_2.10/jars/scalajs-sbt-test-adapter_2.10-0.6.11.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-js/scalajs-tools_2.10/jars/scalajs-tools_2.10-0.6.11.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-sbt/test-interface/jars/test-interface-1.0.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scalaj/scalaj-http_2.10/jars/scalaj-http_2.10-2.2.1.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scalamacros/quasiquotes_2.10/jars/quasiquotes_2.10-2.1.0.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scalariform/scalariform_2.10/jars/scalariform_2.10-0.1.7.jar!/" />
@@ -97,7 +98,6 @@
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.5/org.scala-sbt/sbt/0.13.9/testing-0.13.9.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.5/org.scala-sbt/sbt/0.13.9/tracking-0.13.9.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.5/org.scala-sbt/sbt/0.13.9/xsbti/interface-0.13.9.jar!/" />
-          <root url="jar://$USER_HOME$/.sbt/preloaded/org.scala-sbt/test-interface/1.0/jars/test-interface.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
