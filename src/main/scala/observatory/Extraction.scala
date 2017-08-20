@@ -26,30 +26,18 @@ object Extraction {
       .getLines()
       .map(str => {
         val lineArr = str.split(",")
-        var stn = ""
-        var wban = ""
-        var lat = -100d
-        var long = -100d
-        if (lineArr.size > 0) {
-          stn = lineArr(0)
+        lineArr.size match {
+          case 0 => ("", "", -1000d, -1000d)
+          case 1 => (lineArr(0), "", -1000d, -1000d)
+          case 2 => (lineArr(0), lineArr(1), -1000d, -1000d)
+          case 3 => (lineArr(0), lineArr(1), lineArr(2).toDouble, -1000d)
+          case _ => (lineArr(0), lineArr(1), lineArr(2).toDouble, lineArr(3).toDouble)
         }
-        if (lineArr.size > 1) {
-          wban = lineArr(1)
-        }
-        if (lineArr.size > 2) {
-          lat = lineArr(2).toDouble
-        }
-        if (lineArr.size > 3) {
-          long = lineArr(3).toDouble
-        }
-        (stn, wban, lat, long)
       })
-      .filter(row => row._3 > -100d && row._4 > -100d)
+      .filter(row => row._3 > -1000d && row._4 > -1000d)
       .foldLeft(stations)((stations: Map[(String, String), (Double, Double)], station: (String, String, Double, Double)) => {
-        val newStations = stations.updated((station._1, station._2), (station._3, station._4))
-        newStations
+        stations.updated((station._1, station._2), (station._3 * math.Pi / 180d, station._4 * math.Pi / 180d))
       })
-
 
     println(s"Stations count: ${allStations.size}")
 
@@ -62,18 +50,16 @@ object Extraction {
         (lineArr(0), lineArr(1), lineArr(2).toInt, lineArr(3).toInt, lineArr(4).toDouble)
       })
       .map(tmp => {
-
         try {
           val station = allStations((tmp._1, tmp._2))
           val date = LocalDate.of(year, tmp._3, tmp._4)
           val location = Location(station._1, station._2)
           (date, location, tmp._5)
         } catch {
-          case ex: java.util.NoSuchElementException => (LocalDate.now(), Location(-100d, -100d), -100d)
-
+          case ex: java.util.NoSuchElementException => (LocalDate.now(), Location(-1000d, -1000d), -1000d)
         }
       })
-      .filter(r => r._2.lat > -100d && r._2.lon > -100d)
+      .filter(r => r._2.lat > -1000d && r._2.lon > -1000d)
 
     allTemps.toIterable
   }
@@ -83,7 +69,16 @@ object Extraction {
     * @return A sequence containing, for each location, the average temperature over the year.
     */
   def locationYearlyAverageRecords(records: Iterable[(LocalDate, Location, Double)]): Iterable[(Location, Double)] = {
-    ???
-  }
+    val grouped = records.groupBy(_._2)
 
+    val prom = grouped.mapValues(iter => {
+      iter.foldLeft((0d, 0))((acum, tmp) => {
+        (acum._1 + tmp._3, acum._2 + 1)
+      })
+    })
+
+    prom.map(x => {
+      (x._1, x._2._1 / x._2._2)
+    })
+  }
 }
