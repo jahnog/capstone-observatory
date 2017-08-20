@@ -9,4 +9,9 @@ object Main extends App {
 
   println(s"Length: ${list.length}")
 
+  val lp = Extraction.locationYearlyAverageRecords(l)
+
+  val list2 = lp.toList
+
+  println(s"Length2: ${list2.length}")
 }
