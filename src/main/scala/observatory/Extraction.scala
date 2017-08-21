@@ -47,7 +47,7 @@ object Extraction {
       .getLines()
       .map(str => {
         val lineArr = str.split(",")
-        (lineArr(0), lineArr(1), lineArr(2).toInt, lineArr(3).toInt, lineArr(4).toDouble)
+        (lineArr(0), lineArr(1), lineArr(2).toInt, lineArr(3).toInt, (lineArr(4).toDouble - 32) * 5 / 9)
       })
       .map(tmp => {
         try {
