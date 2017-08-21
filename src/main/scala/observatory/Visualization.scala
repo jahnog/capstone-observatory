@@ -2,7 +2,7 @@ package observatory
 
 import com.sksamuel.scrimage.{Image, Pixel}
 
-import math.{abs, acos, cos, sin}
+import math.{abs, acos, cos, sin, pow, sqrt, asin}
 import scala.annotation.tailrec
 
 /**
@@ -15,6 +15,20 @@ object Visualization {
 
   final val WeightDistancePower: Double = 3
 
+  def greatCircleDistanceRadians(aRadians: Location, bRadians: Location): Double = {
+    acos(sin(aRadians.lat) * sin(bRadians.lat) + cos(aRadians.lat) * cos(bRadians.lat) * cos(abs(aRadians.lon - bRadians.lon)))
+  }
+
+  def greatCircleDistanceRadiansH(aRadians: Location, bRadians: Location): Double = {
+
+    val dLat = bRadians.lat - aRadians.lat
+    val dLon = bRadians.lon - aRadians.lon
+
+    val a = pow(sin(dLat / 2), 2) + pow(sin(dLon / 2), 2) * cos(aRadians.lat) * cos(bRadians.lat)
+
+    2 * asin(sqrt(a))
+  }
+
   /**
     * @param temperatures Known temperatures: pairs containing a location and the temperature at this location
     * @param location     Location where to predict the temperature
@@ -22,14 +36,11 @@ object Visualization {
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
 
-    def greatCircleDistanceRadians(aRadians: Location, bRadians: Location): Double = {
-      acos(sin(aRadians.lat) * sin(bRadians.lat) + cos(aRadians.lat) * cos(bRadians.lat) * cos(abs(aRadians.lon - bRadians.lon)))
-    }
 
     // TODO Implement kd-tree and the modified Shepard method
     // Shepard method
     def weight(aRadians: Location, bRadians: Location): Double = {
-      1d / math.pow(greatCircleDistanceRadians(aRadians, bRadians), WeightDistancePower)
+      1d / math.pow(greatCircleDistanceRadiansH(aRadians, bRadians), WeightDistancePower)
     }
 
     @tailrec
@@ -54,8 +65,8 @@ object Visualization {
   }
 
   def interp(min: Double, minColor: Color, max: Double, maxColor: Color, value: Double): Color = {
-    val distDif = (max - min).toInt
-    val valDif = (value - min).toInt
+    val distDif = max - min
+    val valDif = value - min
 
     val newRed = minColor.red + (valDif * (maxColor.red - minColor.red) / distDif)
 
@@ -63,7 +74,7 @@ object Visualization {
 
     val newBlue = minColor.blue + (valDif * (maxColor.blue - minColor.blue) / distDif)
 
-    Color(newRed, newGreen, newBlue)
+    Color((newRed + 0.5).toInt, (newGreen + 0.5).toInt, (newBlue + 0.5).toInt)
   }
 
 
@@ -125,14 +136,16 @@ object Visualization {
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
 
-    val pixels = Array.ofDim[Pixel](360 * 180)
+    val pixels = Array.fill[Pixel](360 * 180)(Pixel(0, 0, 0, 0))
 
-    var x = 0
-    var y = 0
-    var pos = 0
 
-    while (y < 180) {
-      while (x < 360) {
+    for (y <- (0 until 180)) {
+
+      println("")
+      print(s"Linea: ${y}: ")
+
+      for (x <- (0 until 360)) {
+        print(".")
 
         val loc = Location(90 - y, -180 + x)
         val temp = predictTemperature(temperatures, loc)
@@ -140,12 +153,10 @@ object Visualization {
 
         val pixel = Pixel(color.red, color.green, color.blue, 128)
 
-        pixels(pos) = pixel
+        val pos = y * 360 + x
 
-        pos = pos + 1
-        x = x + 1
+        pixels(pos) = pixel
       }
-      y = y + 1
     }
 
     val image = Image(360, 180, pixels)
