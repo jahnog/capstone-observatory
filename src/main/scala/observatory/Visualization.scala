@@ -136,7 +136,7 @@ object Visualization {
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
 
-    val pixels = Array.fill[Pixel](360 * 180)(Pixel(0, 0, 0, 0))
+    val pixels = Array.fill[Pixel](360 * 180)(Pixel(0, 0, 0, 255))
 
 
     for (y <- (0 until 180)) {
@@ -145,18 +145,23 @@ object Visualization {
       print(s"Linea: ${y}: ")
 
       for (x <- (0 until 360)) {
-        print(".")
 
-        val loc = Location(90 - y, -180 + x)
+        val loc = Location((90 - y) * math.Pi / 180d, (-180 + x) * math.Pi / 180d)
         val temp = predictTemperature(temperatures, loc)
         val color = interpolateColor(colors, temp)
 
-        val pixel = Pixel(color.red, color.green, color.blue, 128)
+        print(s"$temp ")
+
+        val pixel = Pixel(color.red, color.green, color.blue, 255)
 
         val pos = y * 360 + x
 
         pixels(pos) = pixel
       }
+
+      val image = Image(360, 180, pixels)
+
+      image.output(new java.io.File("target/some-image.png"))
     }
 
     val image = Image(360, 180, pixels)
