@@ -1,9 +1,8 @@
 package observatory
 
-import java.io.InputStream
 import java.time.LocalDate
 
-import scala.io.{BufferedSource, Source}
+import scala.io.{BufferedSource}
 
 /**
   * 1st milestone: data extraction
@@ -36,7 +35,7 @@ object Extraction {
       })
       .filter(row => row._3 > -1000d && row._4 > -1000d)
       .foldLeft(stations)((stations: Map[(String, String), (Double, Double)], station: (String, String, Double, Double)) => {
-        stations.updated((station._1, station._2), (station._3 * math.Pi / 180d, station._4 * math.Pi / 180d))
+        stations.updated((station._1, station._2), (station._3, station._4))
       })
 
     println(s"Stations count: ${allStations.size}")
