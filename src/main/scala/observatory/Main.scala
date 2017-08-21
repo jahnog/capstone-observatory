@@ -11,7 +11,7 @@ object Main extends App {
 
   val lp = Extraction.locationYearlyAverageRecords(l)
 
-  val list2 = lp.toList
+  val list2 = lp.toList.take(1000)
 
   println(s"Length2: ${list2.length}")
 

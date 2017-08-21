@@ -13,18 +13,35 @@ object Visualization {
   final val EarthRadius: Double = 6371d // Kilometers
   final val TooCloseDistance: Double = (1d / EarthRadius) // Radians
 
-  final val WeightDistancePower: Double = 3
+  final val WeightDistancePower: Double = 5d
 
-  def greatCircleDistanceRadians(aRadians: Location, bRadians: Location): Double = {
-    acos(sin(aRadians.lat) * sin(bRadians.lat) + cos(aRadians.lat) * cos(bRadians.lat) * cos(abs(aRadians.lon - bRadians.lon)))
+  def greatCircleDistanceRadians(aGrades: Location, bGrades: Location): Double = {
+    val aRadiansLat = aGrades.lat * math.Pi / 180d
+    val aRadiansLon = aGrades.lon * math.Pi / 180d
+    val bRadiansLat = bGrades.lat * math.Pi / 180d
+    val bRadiansLon = bGrades.lon * math.Pi / 180d
+
+    val a = sin(aRadiansLat) * sin(bRadiansLat)
+    val b = cos(aRadiansLat) * cos(bRadiansLat)
+    val c = cos(abs(aRadiansLon - bRadiansLon))
+
+    acos(a + b * c)
   }
 
-  def greatCircleDistanceRadiansH(aRadians: Location, bRadians: Location): Double = {
+  def greatCircleDistanceRadiansH(aGrades: Location, bGrades: Location): Double = {
 
-    val dLat = bRadians.lat - aRadians.lat
-    val dLon = bRadians.lon - aRadians.lon
+    val aRadiansLat = aGrades.lat * math.Pi / 180d
+    val aRadiansLon = aGrades.lon * math.Pi / 180d
+    val bRadiansLat = bGrades.lat * math.Pi / 180d
+    val bRadiansLon = bGrades.lon * math.Pi / 180d
 
-    val a = pow(sin(dLat / 2), 2) + pow(sin(dLon / 2), 2) * cos(aRadians.lat) * cos(bRadians.lat)
+    val dLat = bRadiansLat - aRadiansLat
+    val dLon = bRadiansLon - aRadiansLon
+
+    val sindLat = sin(dLat / 2)
+    val sindLon = sin(dLon / 2)
+
+    val a = pow(sindLat, 2) + pow(sindLon, 2) * cos(aRadiansLat) * cos(bRadiansLat)
 
     2 * asin(sqrt(a))
   }
@@ -36,11 +53,10 @@ object Visualization {
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
 
-
     // TODO Implement kd-tree and the modified Shepard method
     // Shepard method
-    def weight(aRadians: Location, bRadians: Location): Double = {
-      1d / math.pow(greatCircleDistanceRadiansH(aRadians, bRadians), WeightDistancePower)
+    def weight(aGrades: Location, bGrades: Location): Double = {
+      1d / math.pow(greatCircleDistanceRadiansH(aGrades, bGrades), WeightDistancePower)
     }
 
     @tailrec
@@ -138,19 +154,18 @@ object Visualization {
 
     val pixels = Array.fill[Pixel](360 * 180)(Pixel(0, 0, 0, 255))
 
+    for (y <- (0 until 180).par) {
 
-    for (y <- (0 until 180)) {
+      //      println("")
+      //      print(s"Linea: ${y}: ")
 
-      println("")
-      print(s"Linea: ${y}: ")
+      for (x <- 0 until 360) {
 
-      for (x <- (0 until 360)) {
-
-        val loc = Location((90 - y) * math.Pi / 180d, (-180 + x) * math.Pi / 180d)
+        val loc = Location(90 - y, -180 + x)
         val temp = predictTemperature(temperatures, loc)
         val color = interpolateColor(colors, temp)
 
-        print(s"$temp ")
+        //        if( x % 10 == 0 ) { print(".") }
 
         val pixel = Pixel(color.red, color.green, color.blue, 255)
 
@@ -159,9 +174,9 @@ object Visualization {
         pixels(pos) = pixel
       }
 
-      val image = Image(360, 180, pixels)
-
-      image.output(new java.io.File("target/some-image.png"))
+      //      val image = Image(360, 180, pixels)
+      //
+      //      image.output(new java.io.File("target/some-image.png"))
     }
 
     val image = Image(360, 180, pixels)
