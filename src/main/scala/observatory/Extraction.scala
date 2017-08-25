@@ -19,10 +19,14 @@ object Extraction {
 
     val stationsReader = new BufferedSource(getClass().getResourceAsStream(stationsFile))
 
+    if (stationsReader == null) {
+      Iterable[(LocalDate, Location, Double)]()
+    }
     val stations = Map[(String, String), (Double, Double)]()
 
-    val allStations = stationsReader
-      .getLines()
+    val allLines = stationsReader.getLines()
+
+    val allStations = allLines
       .map(str => {
         val lineArr = str.split(",")
         lineArr.size match {
