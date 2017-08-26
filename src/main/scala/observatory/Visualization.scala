@@ -47,11 +47,11 @@ object Visualization {
   }
 
   def moreOrLessClose(a: Location, b: Location): Boolean = {
-    if (abs(a.lat - b.lat) < 35 && (abs(a.lon - b.lon) < 35 || abs(a.lon - b.lon) > 325)) {
+    if (abs(a.lat - b.lat) < 15 && (abs(a.lon - b.lon) < 60 || abs(a.lon - b.lon) > 300)) {
       true
-    } else if (a.lat < -70 && b.lat < -70) {
+    } else if (a.lat < -65 && b.lat < -65) {
       true
-    } else if (a.lat > 70 && b.lat > 70) {
+    } else if (a.lat > 65 && b.lat > 65) {
       true
     } else {
       false
@@ -64,6 +64,8 @@ object Visualization {
     * @return The predicted temperature at `location`
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
+
+    val slow = false
 
     // TODO Implement kd-tree and the modified Shepard method
     // Shepard method
@@ -78,7 +80,7 @@ object Visualization {
       } else {
         val elem: (Location, Double) = temps.head
 
-//        if (moreOrLessClose(elem._1, location)) {
+        if (slow || moreOrLessClose(elem._1, location)) {
           val distRadians = greatCircleDistanceRadians(elem._1, location)
           if (distRadians < TooCloseDistance) {
             (elem._2, 1) // If we have a close point, we return it's temperature.
@@ -86,9 +88,9 @@ object Visualization {
             val w: Double = weight(elem._1, location)
             acumTemps(tAcum + w * elem._2, dAcum + w, temps.tail)
           }
-//        } else {
-//          acumTemps(tAcum, dAcum, temps.tail)
-//        }
+        } else {
+          acumTemps(tAcum, dAcum, temps.tail)
+        }
       }
     }
 
