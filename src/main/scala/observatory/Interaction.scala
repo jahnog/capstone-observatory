@@ -17,7 +17,7 @@ object Interaction {
   def tileLocation(zoom: Int, x: Int, y: Int): Location = {
     val n = math.pow(2, zoom)
     val lon_deg: Double = x / n * 360.0 - 180.0
-    val lat_rad: Double = math.atan(math.sinh(math.Pi * (1 - 2 * y / n)))
+    val lat_rad: Double = math.atan(math.sinh(math.Pi * (1.0 - 2.0 * y / n)))
     val lat_deg: Double = lat_rad * 180.0 / math.Pi
 
     Location(lat_deg, lon_deg)
@@ -35,14 +35,15 @@ object Interaction {
 
     val pixels = Array.fill[Pixel](256 * 256)(Pixel(0, 0, 0, 127))
 
+    print(s"Tile: ")
+
     for (y <- (0 until 256).par) {
 
-      //      println("")
-      //      print(s"Linea: ${y}: ")
+      print(".")
 
       for (x <- 0 until 256) {
 
-        val loc = tileLocation(zoom + 8, tilex + x, tiley + y)
+        val loc = tileLocation(zoom + 8, tilex * 256 + x, tiley * 256 + y)
         val temp = predictTemperature(temperatures, loc)
         val color = interpolateColor(colors, temp)
 
@@ -59,10 +60,9 @@ object Interaction {
       //
       //      image.output(new java.io.File("target/some-image.png"))
     }
+    println("")
 
-    val image = Image(360, 180, pixels)
-
-    image.output(new java.io.File(s"target/tile-$zoom-$tilex-$tiley.png"))
+    val image = Image(256, 256, pixels)
 
     image
   }
@@ -79,7 +79,13 @@ object Interaction {
                            yearlyData: Iterable[(Int, Data)],
                            generateImage: (Int, Int, Int, Int, Data) => Unit
                          ): Unit = {
-    ???
+    yearlyData.foreach(yearly => {
+      for (zoom <- 0 until 4;
+           x <- 0 until math.pow(2, zoom).toInt;
+           y <- 0 until math.pow(2, zoom).toInt
+      ) generateImage(yearly._1, zoom, x, y, yearly._2)
+    }
+    )
   }
 
 }

@@ -13,7 +13,7 @@ object Visualization {
   final val EarthRadius: Double = 6371d // Kilometers
   final val TooCloseDistance: Double = (1d / EarthRadius) // Radians
 
-  final val WeightDistancePower: Double = 5d
+  final val WeightDistancePower: Double = 2d
 
   def greatCircleDistanceRadians(aGrades: Location, bGrades: Location): Double = {
     val aRadiansLat = aGrades.lat * math.Pi / 180d
@@ -46,6 +46,18 @@ object Visualization {
     2 * asin(sqrt(a))
   }
 
+  def moreOrLessClose(a: Location, b: Location): Boolean = {
+    if (abs(a.lat - b.lat) < 35 && (abs(a.lon - b.lon) < 35 || abs(a.lon - b.lon) > 325)) {
+      true
+    } else if (a.lat < -70 && b.lat < -70) {
+      true
+    } else if (a.lat > 70 && b.lat > 70) {
+      true
+    } else {
+      false
+    }
+  }
+
   /**
     * @param temperatures Known temperatures: pairs containing a location and the temperature at this location
     * @param location     Location where to predict the temperature
@@ -65,13 +77,18 @@ object Visualization {
         (tAcum, dAcum)
       } else {
         val elem: (Location, Double) = temps.head
-        val distRadians = greatCircleDistanceRadians(elem._1, location)
-        if (distRadians < TooCloseDistance) {
-          (elem._2, 1) // If we have a close point, we return it's temperature.
-        } else {
-          val w: Double = weight(elem._1, location)
-          acumTemps(tAcum + w * elem._2, dAcum + w, temps.tail)
-        }
+
+//        if (moreOrLessClose(elem._1, location)) {
+          val distRadians = greatCircleDistanceRadians(elem._1, location)
+          if (distRadians < TooCloseDistance) {
+            (elem._2, 1) // If we have a close point, we return it's temperature.
+          } else {
+            val w: Double = weight(elem._1, location)
+            acumTemps(tAcum + w * elem._2, dAcum + w, temps.tail)
+          }
+//        } else {
+//          acumTemps(tAcum, dAcum, temps.tail)
+//        }
       }
     }
 
