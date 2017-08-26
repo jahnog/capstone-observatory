@@ -3,18 +3,6 @@ package observatory
 object Main extends App {
 
 
-  val l = Extraction.locateTemperatures(2015, "/stations.csv", "/2015.csv")
-
-  val list = l.toList
-
-  println(s"Length: ${list.length}")
-
-  val lp = Extraction.locationYearlyAverageRecords(l)
-
-  val list2 = lp.toList  // .take(1000)
-
-  println(s"Length2: ${list2.length}")
-
   val scale = List(
     (60d, Color(255, 255, 255)),
     (32d, Color(255, 0, 0)),
@@ -27,25 +15,37 @@ object Main extends App {
 
   // val image = Visualization.visualize(list2,scale)
 
-  for (zoom <- 0 until 4;
-       x <- 0 until math.pow(2, zoom).toInt;
-       y <- 0 until math.pow(2, zoom).toInt
-  ) {
+  for (year <- (1975 until 2016)) {
 
-    val file = new java.io.File(s"target/temperatures/2015/$zoom/$x-$y.png")
+    val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
 
-    if( ! file.exists() ) {
-      println( s"Generating tile: $zoom - $x - $y")
+    val list = l.toList
 
-      val image2 = Interaction.tile(list2, scale, zoom, x, y)
+    println(s"Year: $year - Length: ${list.length}")
 
-      val folder = new java.io.File(s"target/temperatures/2015/$zoom")
+    val lp = Extraction.locationYearlyAverageRecords(l)
+    val list2 = lp.toList
 
-      if (!folder.exists()) {
-        folder.mkdirs()
+    for (zoom <- 0 until 4;
+         x <- 0 until math.pow(2, zoom).toInt;
+         y <- 0 until math.pow(2, zoom).toInt
+    ) {
+
+      val file = new java.io.File(s"target/temperatures/$year/$zoom/$x-$y.png")
+
+      if (!file.exists()) {
+        println(s"Generating tile: $zoom - $x - $y")
+
+        val image2 = Interaction.tile(list2, scale, zoom, x, y)
+
+        val folder = new java.io.File(s"target/temperatures/$year/$zoom")
+
+        if (!folder.exists()) {
+          folder.mkdirs()
+        }
+
+        image2.output(file)
       }
-
-      image2.output( file )
     }
   }
 
