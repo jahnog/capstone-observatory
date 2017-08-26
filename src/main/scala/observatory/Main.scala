@@ -15,7 +15,7 @@ object Main extends App {
 
   // val image = Visualization.visualize(list2,scale)
 
-  for (year <- (1975 until 2016)) {
+  for (year <- (2015 until 1974 by -1)) {
 
     val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
 
