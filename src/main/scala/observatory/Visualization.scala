@@ -65,7 +65,7 @@ object Visualization {
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
 
-    val slow = false
+    val slow = true
 
     // TODO Implement kd-tree and the modified Shepard method
     // Shepard method

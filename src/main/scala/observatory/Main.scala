@@ -2,7 +2,6 @@ package observatory
 
 object Main extends App {
 
-
   val scale = List(
     (60d, Color(255, 255, 255)),
     (32d, Color(255, 0, 0)),
@@ -20,7 +19,6 @@ object Main extends App {
     val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
 
     val list = l.toList
-
     println(s"Year: $year - Length: ${list.length}")
 
     val lp = Extraction.locationYearlyAverageRecords(l)
@@ -48,5 +46,4 @@ object Main extends App {
       }
     }
   }
-
 }
