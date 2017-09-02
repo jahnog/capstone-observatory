@@ -5,6 +5,8 @@ package observatory
   */
 object Manipulation {
 
+  var grid: Array[Double] = Array.fill[Double](360 * 180)(0)
+
   /**
     * @param temperatures Known temperatures
     * @return A function that, given a latitude in [-89, 90] and a longitude in [-180, 179],
@@ -12,8 +14,30 @@ object Manipulation {
     */
   def makeGrid(temperatures: Iterable[(Location, Double)]): (Int, Int) => Double = {
 
+//    for (y <- (0 until 180).par;
+//         x <- 0 until 360) {
+//      val latitud = 90 - y
+//      val longitud = x - 180
+//      val loc = Location(latitud, longitud)
+//      val temp = Visualization.predictTemperature(temperatures, loc)
+//      grid(y * 360 + x) = temp
+//    }
+
     def calculate(latitud: Int, longitud: Int): Double = {
-      Visualization.predictTemperature(temperatures, Location(latitud.toDouble, longitud.toDouble))
+
+      val loc = Location(latitud, longitud)
+      val temp1 = Visualization.predictTemperature(temperatures, loc)
+      temp1
+
+//      val y = 90 - latitud
+//      val x = 180 + longitud
+//      val temp2 = grid(y * 360 + x)
+//
+//      if (temp1 != temp2) {
+//        println(s"Lat: $latitud - Lon: $longitud - temp1: $temp1 - temp2: $temp2")
+//      }
+//
+//      temp2
     }
 
     calculate
@@ -54,10 +78,6 @@ object Manipulation {
       val loc = Location(latitud.toDouble, longitud.toDouble)
 
       val predictTemp = Visualization.predictTemperature(temperatures, loc)
-
-//      println(s"Location: $loc")
-      //      println(s"Temps: $temperatures")
-      //      println(s"Dev: ${predictTemp - normalTemp}")
 
       predictTemp - normalTemp
     }

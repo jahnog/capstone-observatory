@@ -32,7 +32,7 @@ object Interaction {
     * @return A 256×256 image showing the contents of the tile defined by `x`, `y` and `zooms`
     */
   def tile(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)], zoom: Int, tilex: Int, tiley: Int): Image = {
-    tile128(temperatures, colors, zoom, tilex, tiley)
+    tile256(temperatures, colors, zoom, tilex, tiley)
   }
 
   def tile256(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)], zoom: Int, tilex: Int, tiley: Int): Image = {
@@ -59,10 +59,6 @@ object Interaction {
 
         pixels(pos) = pixel
       }
-
-      //      val image = Image(360, 180, pixels)
-      //
-      //      image.output(new java.io.File("target/some-image.png"))
     }
     println("")
 
