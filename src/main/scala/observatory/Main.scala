@@ -24,6 +24,21 @@ object Main extends App {
     val lp = Extraction.locationYearlyAverageRecords(l)
     val list2 = lp.toList
 
+    println("Making grid")
+
+    val grid = Manipulation.makeGrid(lp.take(10))
+
+    println("Generating grid")
+
+    for (y <- 0 until 180;
+         x <- 0 until 360) {
+
+      val latitud = 90 - y
+      val longitud = x - 180
+
+      val temp = grid(latitud, longitud)
+    }
+
     for (zoom <- 0 until 4;
          x <- 0 until math.pow(2, zoom).toInt;
          y <- 0 until math.pow(2, zoom).toInt
