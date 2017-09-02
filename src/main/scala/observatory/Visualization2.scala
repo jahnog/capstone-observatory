@@ -57,12 +57,10 @@ object Visualization2 {
       for (x <- 0 until 256) {
 
         val loc = tileLocation(zoom + 8, tilex * 256 + x, tiley * 256 + y)
+
         val ceilLat = math.ceil(loc.lat).toInt
         val floorLat = math.floor(loc.lat).toInt
-        val ceilLon = math.ceil(loc.lon).toInt match {
-          case 180 => 0
-          case _ => math.ceil(loc.lon).toInt
-        }
+        val ceilLon = if (loc.lon < 180.0) math.ceil(loc.lon).toInt else math.ceil(loc.lon).toInt - 360
         val floorLon = math.floor(loc.lon).toInt
 
         val d00 = grid(ceilLat, floorLon)
@@ -73,13 +71,13 @@ object Visualization2 {
         val ydiff = math.ceil(loc.lat) - loc.lat
         val xdiff = loc.lon - math.floor(loc.lon)
 
-        val temp = bilinearInterpolation(x, y, d00, d01, d10, d11)
+        val temp = bilinearInterpolation(xdiff, ydiff, d00, d01, d10, d11)
+        // val temp = grid(loc.lat.toInt, loc.lon.toInt)
+
         val color = interpolateColor(colors, temp)
 
         val pixel = Pixel(color.red, color.green, color.blue, 127)
-
         val pos = y * 256 + x
-
         pixels(pos) = pixel
       }
     }
