@@ -14,6 +14,10 @@ object Main extends App {
 
   // val image = Visualization.visualize(list2,scale)
 
+  val layers = Interaction2.availableLayers
+
+  println(s"Layers: $layers")
+
   for (year <- (2015 until 1974 by -1)) {
 
     val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
