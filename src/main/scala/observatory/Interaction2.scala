@@ -29,19 +29,21 @@ object Interaction2 {
   def availableLayers: Seq[Layer] = {
 
     val maxZoom = 3
-    val maxTile = (math.pow( 2, maxZoom) - 1).toInt
+    val maxTile = (math.pow(2, maxZoom) - 1).toInt
 
     val years = for (year <- 2015 until 1974 by -1) yield year
     val temps = years.filter(year => {
-      val file = new java.io.File(s"target/temperatures/$year/$maxZoom/$maxTile-$maxTile.png")
-      val ex = file.exists()
-      ex
+//      val file = new java.io.File(s"target/temperatures/$year/$maxZoom/$maxTile-$maxTile.png")
+//      val ex = file.exists()
+//      ex
+      true
     })
 
     val yearsd = for (year <- 1990 until 2016) yield year
     val devs = yearsd.filter(year => {
-      val file = new java.io.File(s"target/deviations/$year/$maxZoom/$maxTile-$maxTile.png")
-      file.exists()
+//      val file = new java.io.File(s"target/deviations/$year/$maxZoom/$maxTile-$maxTile.png")
+//      file.exists()
+      true
     })
 
     val layers = {
@@ -70,7 +72,7 @@ object Interaction2 {
     * @return A signal containing the year bounds corresponding to the selected layer
     */
   def yearBounds(selectedLayer: Signal[Layer]): Signal[Range] = {
-    ???
+    Signal(selectedLayer().bounds)
   }
 
   /**
@@ -82,7 +84,20 @@ object Interaction2 {
     *         in the `selectedLayer` bounds.
     */
   def yearSelection(selectedLayer: Signal[Layer], sliderValue: Signal[Int]): Signal[Int] = {
-    ???
+    Signal({
+      val bounds = selectedLayer().bounds
+      val slider = sliderValue()
+
+      if (slider < bounds.min) {
+        bounds.min
+      }
+      else if (slider > bounds.max) {
+        bounds.max
+      }
+      else {
+        slider
+      }
+    })
   }
 
   /**
@@ -91,7 +106,15 @@ object Interaction2 {
     * @return The URL pattern to retrieve tiles
     */
   def layerUrlPattern(selectedLayer: Signal[Layer], selectedYear: Signal[Int]): Signal[String] = {
-    ???
+    Signal({
+      val layer = selectedLayer()
+      val year = selectedYear()
+
+      layer.layerName match {
+        case LayerName.Deviations => s"target/deviations/$year/{z}/{x}-{y}.png"
+        case LayerName.Temperatures => s"target/temperatures/$year/{z}/{x}-{y}.png"
+      }
+    })
   }
 
   /**
@@ -100,9 +123,16 @@ object Interaction2 {
     * @return The caption to show
     */
   def caption(selectedLayer: Signal[Layer], selectedYear: Signal[Int]): Signal[String] = {
-    ???
-  }
+    Signal({
+      val layer = selectedLayer()
+      val year = selectedYear()
 
+      layer.layerName match {
+        case LayerName.Deviations => s"Deviations ($year)"
+        case LayerName.Temperatures => s"Temperatures ($year)"
+      }
+    })
+  }
 }
 
 sealed abstract class LayerName(val id: String)
