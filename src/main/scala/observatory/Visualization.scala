@@ -65,8 +65,6 @@ object Visualization {
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
 
-    val slow = true
-
     // TODO Implement kd-tree and the modified Shepard method
     // Shepard method
     def weight(aGrades: Location, bGrades: Location): Double = {
@@ -80,7 +78,7 @@ object Visualization {
       } else {
         val elem: (Location, Double) = temps.head
 
-        if (slow || moreOrLessClose(elem._1, location)) {
+        if ( Speed.slow || moreOrLessClose(elem._1, location)) {
           val distRadians = greatCircleDistanceRadians(elem._1, location)
           if (distRadians < TooCloseDistance) {
             (elem._2, 1) // If we have a close point, we return it's temperature.

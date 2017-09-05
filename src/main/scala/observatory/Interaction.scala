@@ -32,7 +32,11 @@ object Interaction {
     * @return A 256×256 image showing the contents of the tile defined by `x`, `y` and `zooms`
     */
   def tile(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)], zoom: Int, tilex: Int, tiley: Int): Image = {
-    tile256(temperatures, colors, zoom, tilex, tiley)
+    if (Speed.slow) {
+      tile256(temperatures, colors, zoom, tilex, tiley)
+    } else {
+      tile128(temperatures, colors, zoom, tilex, tiley)
+    }
   }
 
   def tile256(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)], zoom: Int, tilex: Int, tiley: Int): Image = {
@@ -40,23 +44,17 @@ object Interaction {
     val pixels = Array.fill[Pixel](256 * 256)(Pixel(0, 0, 0, 127))
 
     print(s"Tile 256: ")
-
     for (y <- (0 until 256).par) {
 
       print(".")
-
       for (x <- 0 until 256) {
-
         val loc = tileLocation(zoom + 8, tilex * 256 + x, tiley * 256 + y)
         val temp = predictTemperature(temperatures, loc)
         val color = interpolateColor(colors, temp)
 
-        //        if( x % 10 == 0 ) { print(".") }
-
+        // if( x % 10 == 0 ) { print(".") }
         val pixel = Pixel(color.red, color.green, color.blue, 127)
-
         val pos = y * 256 + x
-
         pixels(pos) = pixel
       }
     }
@@ -76,13 +74,10 @@ object Interaction {
     val pixels = Array.fill[Pixel](tileSize * tileSize)(Pixel(0, 0, 0, 127))
 
     print(s"Tile $tileSize: ")
-
     for (y <- (0 until tileSize).par) {
 
       print(".")
-
       for (x <- 0 until tileSize) {
-
         val loc = tileLocation(zoom + 8, tilex * standardSize + x * scale, tiley * standardSize + y * scale)
         val temp = predictTemperature(temperatures, loc)
         val color = interpolateColor(colors, temp)
