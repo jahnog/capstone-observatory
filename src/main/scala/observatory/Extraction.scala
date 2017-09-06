@@ -41,6 +41,7 @@ object Extraction {
       .foldLeft(stations)((stations: Map[(String, String), (Double, Double)], station: (String, String, Double, Double)) => {
         stations.updated((station._1, station._2), (station._3, station._4))
       })
+    stationsReader.close()
 
     println(s"Stations count: ${allStations.size}")
     val tempReader = new BufferedSource(getClass().getResourceAsStream(temperaturesFile))
@@ -61,8 +62,9 @@ object Extraction {
         }
       })
       .filter(r => r._2.lat > -1000d && r._2.lon > -1000d)
-
-    allTemps.toIterable
+    val tempList = allTemps.toList
+    tempReader.close()
+    tempList
   }
 
   /**
