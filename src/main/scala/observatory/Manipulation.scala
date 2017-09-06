@@ -5,8 +5,6 @@ package observatory
   */
 object Manipulation {
 
-  var grid: Array[Double] = Array.fill[Double](360 * 180)(0)
-
   /**
     * @param temperatures Known temperatures
     * @return A function that, given a latitude in [-89, 90] and a longitude in [-180, 179],
@@ -14,30 +12,37 @@ object Manipulation {
     */
   def makeGrid(temperatures: Iterable[(Location, Double)]): (Int, Int) => Double = {
 
-//    for (y <- (0 until 180).par;
-//         x <- 0 until 360) {
-//      val latitud = 90 - y
-//      val longitud = x - 180
-//      val loc = Location(latitud, longitud)
-//      val temp = Visualization.predictTemperature(temperatures, loc)
-//      grid(y * 360 + x) = temp
-//    }
+    val grid: Array[Double] = Array.fill[Double](360 * 180)(0)
+
+    if (!Speed.slow) {
+      for (y <- (0 until 180).par;
+           x <- 0 until 360) {
+        val latitud = 90 - y
+        val longitud = x - 180
+        val loc = Location(latitud, longitud)
+        val temp = Visualization.predictTemperature(temperatures, loc)
+        grid(y * 360 + x) = temp
+      }
+    }
 
     def calculate(latitud: Int, longitud: Int): Double = {
 
-      val loc = Location(latitud, longitud)
-      val temp1 = Visualization.predictTemperature(temperatures, loc)
-      temp1
+      if (Speed.slow) {
+        val loc = Location(latitud, longitud)
+        val temp1 = Visualization.predictTemperature(temperatures, loc)
+        temp1
+      }
+      else {
+        val y = 90 - latitud
+        val x = 180 + longitud
+        val temp2 = grid(y * 360 + x)
 
-//      val y = 90 - latitud
-//      val x = 180 + longitud
-//      val temp2 = grid(y * 360 + x)
-//
-//      if (temp1 != temp2) {
-//        println(s"Lat: $latitud - Lon: $longitud - temp1: $temp1 - temp2: $temp2")
-//      }
-//
-//      temp2
+        //              if (temp1 != temp2) {
+        //                println(s"Lat: $latitud - Lon: $longitud - temp1: $temp1 - temp2: $temp2")
+        //              }
+
+        temp2
+      }
     }
 
     calculate
@@ -50,13 +55,34 @@ object Manipulation {
     */
   def average(temperaturess: Iterable[Iterable[(Location, Double)]]): (Int, Int) => Double = {
 
-    def calcAverage(latitud: Int, longitud: Int): Double = {
-      val loc = Location(latitud.toDouble, longitud.toDouble)
+    val averagegrid: Array[Double] = Array.fill[Double](360 * 180)(0)
+
+    for (y <- (0 until 180).par;
+         x <- 0 until 360) {
+      val latitud = 90 - y
+      val longitud = x - 180
+      val loc = Location(latitud, longitud)
 
       val ttuple = temperaturess.foldLeft((0.0, 0))((tuple, temperatures) =>
         (tuple._1 + Visualization.predictTemperature(temperatures, loc), tuple._2 + 1))
 
       val avg = ttuple._1 / ttuple._2
+      averagegrid(y * 360 + x) = avg
+    }
+
+    def calcAverage(latitud: Int, longitud: Int): Double = {
+      //      val loc = Location(latitud.toDouble, longitud.toDouble)
+      //
+      //      val ttuple = temperaturess.foldLeft((0.0, 0))((tuple, temperatures) =>
+      //        (tuple._1 + Visualization.predictTemperature(temperatures, loc), tuple._2 + 1))
+      //
+      //      val avg = ttuple._1 / ttuple._2
+      //
+      //      avg
+
+      val y = 90 - latitud
+      val x = 180 + longitud
+      val avg = averagegrid(y * 360 + x)
 
       avg
     }
@@ -71,15 +97,33 @@ object Manipulation {
     */
   def deviation(temperatures: Iterable[(Location, Double)], normals: (Int, Int) => Double): (Int, Int) => Double = {
 
-    def calcDeviation(latitud: Int, longitud: Int): Double = {
+    val devgrid: Array[Double] = Array.fill[Double](360 * 180)(0)
+
+    for (y <- (0 until 180).par;
+         x <- 0 until 360) {
+      val latitud = 90 - y
+      val longitud = x - 180
+      val loc = Location(latitud, longitud)
 
       val normalTemp = normals(latitud, longitud)
-
-      val loc = Location(latitud.toDouble, longitud.toDouble)
-
       val predictTemp = Visualization.predictTemperature(temperatures, loc)
 
-      predictTemp - normalTemp
+      val dev = predictTemp - normalTemp
+
+      devgrid(y * 360 + x) = dev
+    }
+
+    def calcDeviation(latitud: Int, longitud: Int): Double = {
+
+      //      val normalTemp = normals(latitud, longitud)
+      //      val loc = Location(latitud.toDouble, longitud.toDouble)
+      //      val predictTemp = Visualization.predictTemperature(temperatures, loc)
+      //      predictTemp - normalTemp
+
+      val y = 90 - latitud
+      val x = 180 + longitud
+      val dev = devgrid(y * 360 + x)
+      dev
     }
 
     calcDeviation
