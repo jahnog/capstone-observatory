@@ -17,15 +17,15 @@ object Extraction {
     */
   def locateTemperatures(year: Int, stationsFile: String, temperaturesFile: String): Iterable[(LocalDate, Location, Double)] = {
 
+    println(s"Extracting from: $temperaturesFile")
+
     val stationsReader = new BufferedSource(getClass().getResourceAsStream(stationsFile))
 
     if (stationsReader == null) {
       Iterable[(LocalDate, Location, Double)]()
     }
     val stations = Map[(String, String), (Double, Double)]()
-
     val allLines = stationsReader.getLines()
-
     val allStations = allLines
       .map(str => {
         val lineArr = str.split(",")
@@ -43,9 +43,7 @@ object Extraction {
       })
 
     println(s"Stations count: ${allStations.size}")
-
     val tempReader = new BufferedSource(getClass().getResourceAsStream(temperaturesFile))
-
     val allTemps = tempReader
       .getLines()
       .map(str => {

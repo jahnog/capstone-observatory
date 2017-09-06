@@ -2,6 +2,6 @@ package observatory
 
 object Speed {
 
-  val slow = true;
+  val slow = false;
 
 }
