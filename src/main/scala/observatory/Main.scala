@@ -83,15 +83,15 @@ object Main extends App {
     }
   })
 
-  val baseYears = (for (year <- 1975 until 1990) yield year)
+  val baseYears = (for (year <- 1975 until 1977) yield year)
     .filter(year => {
       val file = new java.io.File(s"target/temperatures/$year/$maxZoom/$maxTile-$maxTile.png")
       file.exists()
     })
     .map(year => {
-      val localTemp = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv").take(100)
+      val localTemp = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv").take(100000)
+      println(s"Calculating averages: $year")
       val localAvg = Extraction.locationYearlyAverageRecords(localTemp)
-
       localAvg
     })
 
@@ -105,7 +105,7 @@ object Main extends App {
   val normals = Manipulation.average(baseYears)
 
   missingDevYears.foreach(year => {
-    val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv").take(100)
+    val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv").take(100000)
     val lp = Extraction.locationYearlyAverageRecords(l)
 
     val deviations = Manipulation.deviation(lp, normals)
