@@ -39,11 +39,7 @@ object Main extends App {
 
     val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
 
-    val list = l.toList
-    println(s"Year: $year - Length: ${list.length}")
-
     val lp = Extraction.locationYearlyAverageRecords(l)
-    val list2 = lp.toList
 
     //    println("Making grid")
     //
@@ -70,7 +66,7 @@ object Main extends App {
       if (!file.exists()) {
         println(s"Generating tile: $zoom - $x - $y")
 
-        val image2 = Interaction.tile(list2, scale, zoom, x, y)
+        val image2 = Interaction.tile(lp, scale, zoom, x, y)
 
         val folder = new java.io.File(s"target/temperatures/$year/$zoom")
 
@@ -89,7 +85,7 @@ object Main extends App {
       file.exists()
     })
     .map(year => {
-      val localTemp = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv").take(100000)
+      val localTemp = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
       println(s"Calculating averages: $year")
       val localAvg = Extraction.locationYearlyAverageRecords(localTemp)
       localAvg
@@ -105,7 +101,7 @@ object Main extends App {
   val normals = Manipulation.average(baseYears)
 
   missingDevYears.foreach(year => {
-    val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv").take(100000)
+    val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
     val lp = Extraction.locationYearlyAverageRecords(l)
 
     val deviations = Manipulation.deviation(lp, normals)
@@ -120,7 +116,7 @@ object Main extends App {
       if (!file.exists()) {
         println(s"Generating tile: $zoom - $x - $y")
 
-        val imgdev = Visualization2.visualizeGrid(deviations, scale, zoom, x, y)
+        val imgdev = Visualization2.visualizeGrid(deviations, scaled, zoom, x, y)
 
         val folder = new java.io.File(s"target/deviations/$year/$zoom")
 
