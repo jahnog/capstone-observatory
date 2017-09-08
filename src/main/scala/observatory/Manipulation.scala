@@ -14,16 +14,20 @@ object Manipulation {
 
     val grid: Array[Double] = Array.fill[Double](360 * 180)(0)
 
+    print("Preparation to make grid")
     if (!Speed.slow) {
-      for (y <- (0 until 180).par;
-           x <- 0 until 360) {
-        val latitud = 90 - y
-        val longitud = x - 180
-        val loc = Location(latitud, longitud)
-        val temp = Visualization.predictTemperature(temperatures, loc)
-        grid(y * 360 + x) = temp
+      for (y <- (0 until 180).par) {
+        print(".")
+        for (x <- 0 until 360) {
+          val latitud = 90 - y
+          val longitud = x - 180
+          val loc = Location(latitud, longitud)
+          val temp = Visualization.predictTemperature(temperatures, loc)
+          grid(y * 360 + x) = temp
+        }
       }
     }
+    println("")
 
     def calculate(latitud: Int, longitud: Int): Double = {
 
@@ -33,9 +37,23 @@ object Manipulation {
         temp1
       }
       else {
-        val y = 90 - latitud
-        val x = 180 + longitud
-        val temp2 = grid(y * 360 + x)
+        val y = if (latitud > -90) {
+          90 - latitud
+        } else {
+          179
+        }
+        val x = if (longitud < 180) {
+          180 + longitud
+        } else {
+          359
+        }
+        var temp2 = 0.0
+        if (y * 360 + x >= 0) {
+          temp2 = grid(y * 360 + x)
+        }
+        else {
+          println("Ehh")
+        }
 
         //              if (temp1 != temp2) {
         //                println(s"Lat: $latitud - Lon: $longitud - temp1: $temp1 - temp2: $temp2")
@@ -65,24 +83,18 @@ object Manipulation {
     println("")
 
     print(s"Pre calculating averages")
-    val avgGrid = grids.foldLeft(averagegrid)((a, b) => {
-      for (y <- (0 until 180).par) {
-        print(".")
-        for (x <- 0 until 360) {
-          a(y * 360 + x) = a(y * 360 + x) + b(y * 360 + x)
-        }
-      }
-      a
-    })
-    println("")
-
-    val perlen = grids.size
     for (y <- (0 until 180).par) {
       print(".")
       for (x <- 0 until 360) {
-        avgGrid(y * 360 + x) = avgGrid(y * 360 + x) / perlen
+        val acum = grids.foldLeft(0.0)((ac, grid) => {
+          val latitud = 90 - y
+          val longitud = x - 180
+          ac + grid(latitud, longitud)
+        })
+        averagegrid(y * 360 + x) = acum / grids.size
       }
     }
+    println("")
 
     //    for (y <- (0 until 180).par) {
     //      print(".")

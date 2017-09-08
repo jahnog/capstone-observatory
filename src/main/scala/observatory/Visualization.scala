@@ -110,7 +110,6 @@ object Visualization {
     Color((newRed + 0.5).toInt, (newGreen + 0.5).toInt, (newBlue + 0.5).toInt)
   }
 
-
   /**
     * @param points Pairs containing a value and its associated color
     * @param value  The value to interpolate
