@@ -79,7 +79,7 @@ object Main extends App {
     }
   })
 
-  val baseYears = (for (year <- 1975 until 1977) yield year)
+  val baseYears = (for (year <- 1975 until 1990) yield year)
     .filter(year => {
       val file = new java.io.File(s"target/temperatures/$year/$maxZoom/$maxTile-$maxTile.png")
       file.exists()
