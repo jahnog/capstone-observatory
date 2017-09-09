@@ -13,7 +13,7 @@ object Visualization {
   final val EarthRadius: Double = 6371d // Kilometers
   final val TooCloseDistance: Double = (12d / EarthRadius) // Radians
 
-  final val WeightDistancePower: Double = 5d
+  final val WeightDistancePower: Double = 6d
 
   def greatCircleDistanceRadians(aGrades: Location, bGrades: Location): Double = {
     val aRadiansLat = aGrades.lat * math.Pi / 180d
