@@ -49,18 +49,26 @@ object Visualization2 {
                      tiley: Int
                    ): Image = {
 
-    val pixels = Array.fill[Pixel](256 * 256)(Pixel(0, 0, 0, 127))
+    val pixels = Array.fill[Pixel](256 * 256)(Pixel(0, 0, 0, 0))
 
     print(s"Tile 256: ")
-    for (y <- (0 until 256).par) {
+    for (y <- 0 until 256) {
       print(".")
       for (x <- 0 until 256) {
 
         val loc = tileLocation(zoom + 8, tilex * 256 + x, tiley * 256 + y)
 
-        val ceilLat = math.ceil(loc.lat).toInt
-        val floorLat = math.floor(loc.lat).toInt
-        val ceilLon = if (loc.lon < 180.0) math.ceil(loc.lon).toInt else math.ceil(loc.lon).toInt - 360
+        val ceilLat = if (loc.lat > 90) {
+          90
+        } else {
+          math.floor(loc.lat).toInt + 1
+        }
+        val floorLat = if (loc.lat <= -90) {
+          -89
+        } else {
+          math.floor(loc.lat).toInt
+        }
+        val ceilLon = if (loc.lon < 180.0) (math.floor(loc.lon).toInt + 1) else (math.floor(loc.lon).toInt - 360 + 1)
         val floorLon = math.floor(loc.lon).toInt
 
         val d00 = grid(ceilLat, floorLon)
@@ -68,7 +76,7 @@ object Visualization2 {
         val d10 = grid(ceilLat, ceilLon)
         val d11 = grid(floorLat, ceilLon)
 
-        val ydiff = math.ceil(loc.lat) - loc.lat
+        val ydiff = (math.floor(loc.lat) + 1) - loc.lat
         val xdiff = loc.lon - math.floor(loc.lon)
 
         val temp = bilinearInterpolation(xdiff, ydiff, d00, d01, d10, d11)

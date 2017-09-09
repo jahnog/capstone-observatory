@@ -11,9 +11,9 @@ import scala.annotation.tailrec
 object Visualization {
 
   final val EarthRadius: Double = 6371d // Kilometers
-  final val TooCloseDistance: Double = (1d / EarthRadius) // Radians
+  final val TooCloseDistance: Double = (12d / EarthRadius) // Radians
 
-  final val WeightDistancePower: Double = 2d
+  final val WeightDistancePower: Double = 5d
 
   def greatCircleDistanceRadians(aGrades: Location, bGrades: Location): Double = {
     val aRadiansLat = aGrades.lat * math.Pi / 180d
@@ -28,7 +28,7 @@ object Visualization {
     acos(a + b * c)
   }
 
-  def greatCircleDistanceRadiansH(aGrades: Location, bGrades: Location): Double = {
+  def greatCircleDistanceRadiansX(aGrades: Location, bGrades: Location): Double = {
 
     val aRadiansLat = aGrades.lat * math.Pi / 180d
     val aRadiansLon = aGrades.lon * math.Pi / 180d
@@ -67,8 +67,8 @@ object Visualization {
 
     // TODO Implement kd-tree and the modified Shepard method
     // Shepard method
-    def weight(aGrades: Location, bGrades: Location): Double = {
-      1d / math.pow(greatCircleDistanceRadiansH(aGrades, bGrades), WeightDistancePower)
+    def weight(aGrades: Location, bGrades: Location, distRadians: Double): Double = {
+      1d / math.pow(distRadians, WeightDistancePower)
     }
 
     @tailrec
@@ -78,12 +78,12 @@ object Visualization {
       } else {
         val elem: (Location, Double) = temps.head
 
-        if ( Speed.slow || moreOrLessClose(elem._1, location)) {
+        if (Speed.slow || moreOrLessClose(elem._1, location)) {
           val distRadians = greatCircleDistanceRadians(elem._1, location)
           if (distRadians < TooCloseDistance) {
             (elem._2, 1) // If we have a close point, we return it's temperature.
           } else {
-            val w: Double = weight(elem._1, location)
+            val w: Double = weight(elem._1, location, distRadians)
             acumTemps(tAcum + w * elem._2, dAcum + w, temps.tail)
           }
         } else {
