@@ -15,53 +15,61 @@ object Manipulation {
     val grid: Array[Double] = Array.fill[Double](360 * 180)(0)
 
     print("Preparation to make grid")
-    if (!Speed.slow) {
-      for (y <- (0 until 180).par) {
-        print(".")
-        for (x <- 0 until 360) {
-          val latitud = 90 - y
-          val longitud = x - 180
-          val loc = Location(latitud, longitud)
-          val temp = Visualization.predictTemperature(temperatures, loc)
-          grid(y * 360 + x) = temp
+    //    if (!Speed.slow) {
+    for (y <- (0 until 180).par) {
+      print(".")
+      for (x <- 0 until 360) {
+        val latitud = 90 - y
+        val longitud = x - 180
+        if( x == 102 && y == 122 ){
+          println("Aqui")
         }
+        val loc = Location(latitud, longitud)
+        val temp = Visualization.predictTemperature(temperatures, loc)
+        grid(y * 360 + x) = temp
       }
     }
+    //    }
     println("")
 
     def calculate(latitud: Int, longitud: Int): Double = {
 
-      if (Speed.slow) {
-        val loc = Location(latitud, longitud)
-        val temp1 = Visualization.predictTemperature(temperatures, loc)
-        temp1
+      //      if (Speed.slow) {
+      //        val loc = Location(latitud, longitud)
+      //        val temp1 = Visualization.predictTemperature(temperatures, loc)
+      //        temp1
+      //      }
+      //      else {
+
+      val y = if (latitud > -90) {
+        90 - latitud
+      } else {
+        179
+      }
+      val x = if (longitud < 180) {
+        180 + longitud
+      } else {
+        359
+      }
+      if( x == 102 && y == 122 ){
+        println("Aqui")
+      }
+      var temp2 = 0.0
+      if (y * 360 + x >= 0) {
+        temp2 = grid(y * 360 + x)
       }
       else {
-        val y = if (latitud > -90) {
-          90 - latitud
-        } else {
-          179
-        }
-        val x = if (longitud < 180) {
-          180 + longitud
-        } else {
-          359
-        }
-        var temp2 = 0.0
-        if (y * 360 + x >= 0) {
-          temp2 = grid(y * 360 + x)
-        }
-        else {
-          println("Ehh")
-        }
-
-        //              if (temp1 != temp2) {
-        //                println(s"Lat: $latitud - Lon: $longitud - temp1: $temp1 - temp2: $temp2")
-        //              }
-
-        temp2
+        println("Ehh")
       }
+
+      //              if (temp1 != temp2) {
+      //                println(s"Lat: $latitud - Lon: $longitud - temp1: $temp1 - temp2: $temp2")
+      //              }
+
+      temp2
     }
+
+    //    }
 
     calculate
   }

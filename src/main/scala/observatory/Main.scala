@@ -42,6 +42,10 @@ object Main extends App {
     val lp = Extraction.locationYearlyAverageRecords(l)
 
     //    println("Making grid")
+    // val grid = Manipulation.makeGrid(lp)
+    //    println("Generating grid")
+
+    //    println("Making grid")
     //
     //    val grid = Manipulation.makeGrid(lp.take(10))
     //
@@ -67,6 +71,7 @@ object Main extends App {
         println(s"Generating tile: $zoom - $x - $y")
 
         val image2 = Interaction.tile(lp, scale, zoom, x, y)
+        // val image2 = Visualization2.visualizeGrid(grid, scale, zoom, x, y)
 
         val folder = new java.io.File(s"target/temperatures/$year/$zoom")
 
@@ -127,9 +132,5 @@ object Main extends App {
         imgdev.output(file)
       }
     }
-
-
   })
-
-
 }

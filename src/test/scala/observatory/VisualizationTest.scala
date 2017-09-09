@@ -21,7 +21,7 @@ trait VisualizationTest extends FunSuite with Checkers {
     val a = Location( 36.12 , -86.67 )
     val b = Location( 33.94 , -118.40 )
 
-    val dist = 6372.8 * Visualization.greatCircleDistanceRadiansH( a, b )
+    val dist = 6372.8 * Visualization.greatCircleDistanceRadians( a, b )
 
     assert(dist === 2887.2599506071087)
   }
