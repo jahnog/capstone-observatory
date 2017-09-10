@@ -32,11 +32,20 @@ object Interaction {
     * @return A 256×256 image showing the contents of the tile defined by `x`, `y` and `zooms`
     */
   def tile(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)], zoom: Int, tilex: Int, tiley: Int): Image = {
-    if (Speed.slow) {
+
+    val mstart = System.currentTimeMillis()
+
+    val image = if (Speed.slow) {
       tile256(temperatures, colors, zoom, tilex, tiley)
     } else {
       tile128(temperatures, colors, zoom, tilex, tiley)
     }
+
+    val mend = System.currentTimeMillis()
+
+    println(s"Millis: ${mend - mstart}")
+
+    image
   }
 
   def tile256(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)], zoom: Int, tilex: Int, tiley: Int): Image = {

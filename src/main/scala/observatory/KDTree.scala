@@ -4,33 +4,35 @@ object KDTree {
 
   import Numeric._
 
+  case class KDPoint[T,V]( dimensions: Seq[T], data: V )
+
   // Task 1A. Build tree of KDNodes. Translated from Wikipedia.
-  def apply[T](points: Seq[Seq[T]], depth: Int = 0)(implicit num: Numeric[T]): Option[KDNode[T]] = {
-    val dim = points.headOption.map(_.size) getOrElse 0
+  def apply[T,V](points: Seq[KDPoint[T,V]], depth: Int = 0)(implicit num: Numeric[T]): Option[KDNode[T,V]] = {
+    val dim = points.headOption.map(_.dimensions.size) getOrElse 0
     if (points.isEmpty || dim < 1) {
       None
     }
     else {
       val axis = depth % dim
-      val sorted = points.sortBy(_ (axis))
-      val median = sorted(sorted.size / 2)(axis)
-      val (left, right) = sorted.partition(v => num.lt(v(axis), median))
+      val sorted = points.sortBy(_.dimensions (axis))
+      val median = sorted(sorted.size / 2).dimensions (axis)
+      val (left, right) = sorted.partition(v => num.lt(v.dimensions(axis), median))
       Some(KDNode(right.head, apply(left, depth + 1), apply(right.tail, depth + 1), axis))
     }
   }
 
   // Task 1B. Find the nearest node in this subtree. Translated from Wikipedia.
-  case class KDNode[T](value: Seq[T], left: Option[KDNode[T]], right: Option[KDNode[T]], axis: Int)(implicit num: Numeric[T]) {
-    def nearest(to: Seq[T]): Nearest[T] = {
-      val default = Nearest(value, to, Set(this))
-      compare(to, value) match {
+  case class KDNode[T,V](value: KDPoint[T,V], left: Option[KDNode[T,V]], right: Option[KDNode[T,V]], axis: Int)(implicit num: Numeric[T]) {
+    def nearest(to: Seq[T]): Nearest[T,V] = {
+      val default = Nearest(value.dimensions, to, Set(this))
+      compare(to, value.dimensions) match {
         case 0 => default // exact match
         case t =>
           lazy val bestL = left.map(_ nearest to).getOrElse(default)
           lazy val bestR = right.map(_ nearest to).getOrElse(default)
           val branch1 = if (t < 0) bestL else bestR
           val best = if (num.lt(branch1.distsq, default.distsq)) branch1 else default
-          val splitDist = num.minus(to(axis), value(axis))
+          val splitDist = num.minus(to(axis), value.dimensions (axis))
           if (num.lt(num.times(splitDist, splitDist), best.distsq)) {
             val branch2 = if (t < 0) bestR else bestL
             val visited = branch2.visited ++ best.visited + this
@@ -48,7 +50,7 @@ object KDTree {
   }
 
   // Keep track of nodes visited, as per task. Pretty-printable.
-  case class Nearest[T](value: Seq[T], to: Seq[T], visited: Set[KDNode[T]] = Set[KDNode[T]]())(implicit num: Numeric[T]) {
+  case class Nearest[T,V](value: Seq[T], to: Seq[T], visited: Set[KDNode[T,V]] = Set[KDNode[T,V]]())(implicit num: Numeric[T]) {
     lazy val distsq = KDTree.distsq(value, to)
 
     override def toString = f"Searched for=${to} found=${value} distance=${math.sqrt(num.toDouble(distsq))}%.4f visited=${visited.size}"
