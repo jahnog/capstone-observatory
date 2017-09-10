@@ -28,7 +28,7 @@ object Visualization {
     acos(a + b * c)
   }
 
-  def greatCircleDistanceRadiansX(aGrades: Location, bGrades: Location): Double = {
+  def greatCircleDistanceRadiansZ(aGrades: Location, bGrades: Location): Double = {
 
     val aRadiansLat = aGrades.lat * math.Pi / 180d
     val aRadiansLon = aGrades.lon * math.Pi / 180d
