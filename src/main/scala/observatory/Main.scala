@@ -45,20 +45,7 @@ object Main extends App {
     // val grid = Manipulation.makeGrid(lp)
     //    println("Generating grid")
 
-    //    println("Making grid")
-    //
-    //    val grid = Manipulation.makeGrid(lp.take(10))
-    //
-    //    println("Generating grid")
-
-    //    for (y <- 0 until 180;
-    //         x <- 0 until 360) {
-    //
-    //      val latitud = 90 - y
-    //      val longitud = x - 180
-    //
-    //      val temp = grid(latitud, longitud)
-    //    }
+    // val grid = Manipulation.makeGridTree(lp)
 
     for (zoom <- 0 until (maxZoom + 1);
          x <- 0 until math.pow(2, zoom).toInt;
