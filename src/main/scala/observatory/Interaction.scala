@@ -35,7 +35,7 @@ object Interaction {
 
     val mstart = System.currentTimeMillis()
 
-    val image = if (Speed.slow) {
+    val image = if (false) {
       tile256(temperatures, colors, zoom, tilex, tiley)
     } else {
       tile128(temperatures, colors, zoom, tilex, tiley)

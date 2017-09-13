@@ -34,6 +34,7 @@ object Main extends App {
     val file = new java.io.File(s"target/temperatures/$y/$maxZoom/$maxTile-$maxTile.png")
     !file.exists()
   })
+    .filter( y => (y % 2) == 1 )
 
   missingYears.foreach(year => {
 
