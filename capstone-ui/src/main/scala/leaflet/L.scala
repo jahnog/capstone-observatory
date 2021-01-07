@@ -45,6 +45,7 @@ sealed trait Map extends js.Object {
 
 case class MapOptions(
   @(JSExport @field) zoomControl: Boolean,
+  @(JSExport @field) minZoom: Int,
   @(JSExport @field) maxZoom: Int
 )
 
