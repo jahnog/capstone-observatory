@@ -1,7 +1,6 @@
-addSbtPlugin("org.jetbrains" % "sbt-ide-settings" % "1.1.0")
-
+addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "5.1.0")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.33")
 
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.3")
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-RC2")
 
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
