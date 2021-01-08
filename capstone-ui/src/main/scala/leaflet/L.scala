@@ -10,7 +10,7 @@ import scala.scalajs.js.annotation.{JSExport, JSName}
 @js.native
 object L extends js.Object {
 
-  def map(elementId: Element, options: MapOptions): Map = js.native
+  def map(elementId: Element, options: js.Dynamic): Map = js.native
 
   def tileLayer(urlPattern: String): TileLayer = js.native
 
