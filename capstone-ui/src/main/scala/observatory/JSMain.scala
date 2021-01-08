@@ -32,7 +32,7 @@ object JSMain extends js.JSApp {
 
   def setupMap(selectedLayer: Signal[Layer], selectedYear: Signal[Int]): Unit = {
     val mapElement = tags.div(styles.height := "100%").render
-    val map = L.map(mapElement, MapOptions(zoomControl = false, minZoom = 0, maxZoom = 3))
+    val map = L.map(mapElement, js.Dynamic.literal(zoomControl = false, minZoom = 0, maxZoom = 3))
     map.setView(L.latLng(48.0, 14.0), 3)
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map)
     val urlSignal = Interaction2.layerUrlPattern(selectedLayer, selectedYear)
