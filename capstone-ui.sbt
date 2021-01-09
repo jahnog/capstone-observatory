@@ -16,5 +16,5 @@ val capstoneUI =
         "org.scala-js" %%% "scalajs-dom" % "1.1.0",
         "com.lihaoyi" %%% "scalatags" % "0.6.7"
       ),
-      persistLauncher := true
+      scalaJSUseMainModuleInitializer := true
     )
