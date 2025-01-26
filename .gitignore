@@ -1,5 +1,8 @@
 .idea/libraries/
 .idea/sonarlint/
+.metals/
+.bloop/
+metals.sbt
 
 target/
 project/target/
