@@ -12,7 +12,9 @@ import scalatags.JsDom.{Cap, Aggregate, tags, attrs, styles}
 object Implicits extends Cap with Aggregate with DataConverters with LowPriorityImplicits
 import Implicits._
 
-object JSMain extends js.JSApp {
+object JSMain {
+
+  def main(args: Array[String]): Unit = main()
 
   def main(): Unit = {
     val availableLayers = Interaction2.availableLayers

@@ -3,8 +3,7 @@ import Keys._
 import sys.process.{Process => SysProc, ProcessLogger}
 import java.util.concurrent._
 import collection.mutable.ListBuffer
-import scala.pickling.Defaults._
-import scala.pickling.json._
+import scala.util.parsing.json.JSON
 
 final case class GradingSummary(score: Int, maxScore: Int, feedback: String)
 
@@ -149,12 +148,39 @@ object ScalaTestRunner {
 
   private def unpickleSummary(logError: (String) => Unit, runLog: String, summaryFileStr: String): GradingSummary = {
     try {
-      scala.io.Source.fromFile(summaryFileStr).getLines.mkString("\n").unpickle[GradingSummary]
+      val summaryJson = scala.io.Source.fromFile(summaryFileStr).getLines.mkString("\n")
+      JSON.parseFull(summaryJson) match {
+        case Some(data: Map[String @unchecked, Any @unchecked]) =>
+          GradingSummary(
+            intField(data, "score"),
+            intField(data, "maxScore"),
+            stringField(data, "feedback")
+          )
+        case _ =>
+          throw new IllegalArgumentException("Could not parse grading summary JSON")
+      }
     } catch {
       case e: Throwable =>
         val msg = "Error occured while reading ScalaTest summary file\n" + e.toString + "\n" + runLog
         logError(msg)
         throw e
+    }
+  }
+
+  private def intField(data: Map[String, Any], key: String): Int = {
+    data.get(key) match {
+      case Some(value: Double) => value.toInt
+      case Some(value: Int) => value
+      case Some(value: BigDecimal) => value.toInt
+      case Some(value: Long) => value.toInt
+      case other => throw new IllegalArgumentException(s"Missing numeric field '$key': $other")
+    }
+  }
+
+  private def stringField(data: Map[String, Any], key: String): String = {
+    data.get(key) match {
+      case Some(value: String) => value
+      case other => throw new IllegalArgumentException(s"Missing string field '$key': $other")
     }
   }
 

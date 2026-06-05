@@ -1,3 +1,5 @@
+import StudentBuild._
+
 course := "capstone"
 assignment := "observatory"
 
