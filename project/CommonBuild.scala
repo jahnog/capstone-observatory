@@ -1,6 +1,6 @@
 import sbt._
 
-trait CommonBuild extends Build {
+trait CommonBuild {
 
   val course = SettingKey[String]("course")
 
@@ -10,6 +10,6 @@ trait CommonBuild extends Build {
 
   val commonSourcePackages = SettingKey[Seq[String]]("commonSourcePackages")
 
-  lazy val scalaTestDependency = "org.scalatest" %% "scalatest" % "2.2.4"
+  lazy val scalaTestDependency = "org.scalatest" %% "scalatest" % "3.0.9"
 
 }

@@ -40,12 +40,17 @@ class StudentBuildLike protected() extends CommonBuild {
 
   val packageSubmission = TaskKey[File]("packageSubmission")
 
-  val sourceMappingsWithoutPackages =
-    (scalaSource, commonSourcePackages, unmanagedSources, unmanagedSourceDirectories, baseDirectory, compile in Test) map { (scalaSource, commonSourcePackages, srcs, sdirs, base, _) =>
+  val sourceMappingsWithoutPackages = Def.task {
+      val scalaSourceDir = scalaSource.value
+      val commonPackages = commonSourcePackages.value
+      val srcs = unmanagedSources.value
+      val sdirs = unmanagedSourceDirectories.value
+      val base = baseDirectory.value
+      (Test / compile).value
       val allFiles = srcs --- sdirs --- base
-      val commonSourcePaths = commonSourcePackages.map(scalaSource / _).map(_.getPath)
+      val commonSourcePaths = commonPackages.map(scalaSourceDir / _).map(_.getPath)
       val withoutCommonSources = allFiles.filter(f => !commonSourcePaths.exists(f.getPath.startsWith))
-      withoutCommonSources pair (relativeTo(sdirs) | relativeTo(base) | flat)
+      withoutCommonSources pair (Path.relativeTo(sdirs) | Path.relativeTo(base) | Path.flat)
     }
 
   val packageSubmissionFiles = {
@@ -94,7 +99,7 @@ class StudentBuildLike protected() extends CommonBuild {
   lazy val submitLocalSetting = submitLocal := {
     val args: Seq[String] = Def.spaceDelimited("<arg>").parsed
     val s: TaskStreams = streams.value // for logging
-    val jar = (packageSubmission in Compile).value
+    val jar = (Compile / packageSubmission).value
 
     val base64Jar = prepareJar(jar, s)
     args match {
@@ -115,7 +120,7 @@ class StudentBuildLike protected() extends CommonBuild {
   lazy val submitSetting = submit := {
     val args: Seq[String] = Def.spaceDelimited("<arg>").parsed
     val s: TaskStreams = streams.value // for logging
-    val jar = (packageSubmission in Compile).value
+    val jar = (Compile / packageSubmission).value
 
     val assignmentDetails = assignmentInfo.value
     val assignmentKey = assignmentDetails.key
@@ -272,7 +277,7 @@ class StudentBuildLike protected() extends CommonBuild {
 
   val styleCheck = TaskKey[Unit]("styleCheck")
   val styleCheckSetting = styleCheck := {
-    val (_, sourceFiles, info, assignmentName) = ((compile in Compile).value, (sources in Compile).value, assignmentInfo.value, assignment.value)
+    val (_, sourceFiles, info, assignmentName) = ((Compile / compile).value, (Compile / sources).value, assignmentInfo.value, assignment.value)
     val styleSheet = info.styleSheet
     val logger = streams.value.log
     styleSheet match {
