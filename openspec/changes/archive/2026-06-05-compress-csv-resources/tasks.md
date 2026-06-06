@@ -32,4 +32,4 @@
 
 - [x] 5.1 Add a brief note (in a new or existing `data/README` or similar) describing how a maintainer would regenerate the CSVs from source and re-compress them if the underlying NOAA data ever needs to be refreshed.
 - [x] 5.2 Run `openspec status --change compress-csv-resources` and ensure all artifacts show the expected "done" state.
-- [ ] 5.3 Commit the code changes, the compressed resources, the removal of the large plain CSVs, and the planning artifacts together as the implementation of this change.
+- [x] 5.3 Commit the code changes, the compressed resources, the removal of the large plain CSVs, and the planning artifacts together as the implementation of this change.
