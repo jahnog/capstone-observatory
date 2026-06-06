@@ -1,6 +1,57 @@
 package observatory
 
+import java.io.File
+
+import scala.util.Try
+
 object Main extends App {
+
+  private val defaultTemperatureYears = (for (year <- (2015 until 1974 by -1)) yield year)
+    .filter(year => (year % 2) == 1)
+
+  private val defaultDeviationYears = for (year <- (2015 until 1989 by -1)) yield year
+
+  private val defaultBaselineYears = for (year <- 1975 until 1990) yield year
+
+  private def rawConfig(propertyName: String, envName: String): Option[String] =
+    sys.props.get(propertyName).orElse(sys.env.get(envName)).map(_.trim)
+
+  private def stringConfig(propertyName: String, envName: String, default: String): String =
+    rawConfig(propertyName, envName).filter(_.nonEmpty).getOrElse(default)
+
+  private def intConfig(propertyName: String, envName: String, default: Int): Int =
+    rawConfig(propertyName, envName)
+      .filter(_.nonEmpty)
+      .map(value => Try(value.toInt).getOrElse(throw new IllegalArgumentException(s"Invalid integer for $propertyName: $value")))
+      .getOrElse(default)
+
+  private def yearsConfig(propertyName: String, envName: String, default: Seq[Int]): Seq[Int] =
+    rawConfig(propertyName, envName)
+      .map(parseYears)
+      .getOrElse(default)
+
+  private def parseYears(raw: String): Seq[Int] = {
+    if (raw.isEmpty) {
+      Vector.empty
+    } else {
+      raw.split(",").iterator
+        .map(_.trim)
+        .filter(_.nonEmpty)
+        .map(value => Try(value.toInt).getOrElse(throw new IllegalArgumentException(s"Invalid year value: $value")))
+        .toVector
+    }
+  }
+
+  private def enabledLayersConfig(): Set[String] =
+    rawConfig("tile.generation.layers", "TILE_GENERATION_LAYERS")
+      .map { raw =>
+        if (raw.isEmpty) {
+          Set.empty[String]
+        } else {
+          raw.split(",").iterator.map(_.trim.toLowerCase).filter(_.nonEmpty).toSet
+        }
+      }
+      .getOrElse(Set("temperatures", "deviations"))
 
   val scale = List(
     (60d, Color(255, 255, 255)),
@@ -21,104 +72,73 @@ object Main extends App {
     (-2d, Color(0, 255, 255)),
     (-7d, Color(0, 0, 255)))
 
-  val maxZoom = 3
-  val maxTile = (math.pow(2, maxZoom) - 1).toInt
+  val maxZoom = intConfig("tile.generation.maxZoom", "TILE_GENERATION_MAX_ZOOM", 3)
 
   val layers = Interaction2.availableLayers
+  val targetRoot = new File(stringConfig("tile.generation.targetRoot", "TILE_GENERATION_TARGET_ROOT", "target"))
+  val temperatureOutputRoot = new File(targetRoot, "temperatures")
+  val deviationOutputRoot = new File(targetRoot, "deviations")
+  val enabledLayers = enabledLayersConfig()
+  val years = yearsConfig("tile.generation.temperatureYears", "TILE_GENERATION_TEMPERATURE_YEARS", defaultTemperatureYears)
+  val devYears = yearsConfig("tile.generation.deviationYears", "TILE_GENERATION_DEVIATION_YEARS", defaultDeviationYears)
+  val baselineYears = yearsConfig("tile.generation.baselineYears", "TILE_GENERATION_BASELINE_YEARS", defaultBaselineYears)
 
   println(s"Layers: $layers")
+  println(s"Tile generation config: target=${targetRoot.getPath}, maxZoom=$maxZoom, enabled=${enabledLayers.toSeq.sorted.mkString(",")}")
 
-  val years = for (year <- (2015 until 1974 by -1)) yield year
+  if (enabledLayers.contains("temperatures")) {
+    val missingYears = years.map(year => year -> TileGeneration.missingTiles(temperatureOutputRoot, year, maxZoom))
+      .filter { case (_, missingTiles) => missingTiles.nonEmpty }
 
-  val missingYears = years.filter(y => {
-    val file = new java.io.File(s"target/temperatures/$y/$maxZoom/$maxTile-$maxTile.png")
-    !file.exists()
-  })
-    .filter( y => (y % 2) == 1 )
+    missingYears.foreach { case (year, missingTiles) =>
 
-  missingYears.foreach(year => {
+      val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
 
-    val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
+      val lp = Extraction.locationYearlyAverageRecords(l)
 
-    val lp = Extraction.locationYearlyAverageRecords(l)
+      //    println("Making grid")
+      // val grid = Manipulation.makeGrid(lp)
+      //    println("Generating grid")
 
-    //    println("Making grid")
-    // val grid = Manipulation.makeGrid(lp)
-    //    println("Generating grid")
+      // val grid = Manipulation.makeGridTree(lp)
 
-    // val grid = Manipulation.makeGridTree(lp)
-
-    for (zoom <- 0 until (maxZoom + 1);
-         x <- 0 until math.pow(2, zoom).toInt;
-         y <- 0 until math.pow(2, zoom).toInt
-    ) {
-
-      val file = new java.io.File(s"target/temperatures/$year/$zoom/$x-$y.png")
-
-      if (!file.exists()) {
-        println(s"Generating tile: $zoom - $x - $y")
-
-        val image2 = Interaction.tile(lp, scale, zoom, x, y)
-        // val image2 = Visualization2.visualizeGrid(grid, scale, zoom, x, y)
-
-        val folder = new java.io.File(s"target/temperatures/$year/$zoom")
-
-        if (!folder.exists()) {
-          folder.mkdirs()
-        }
-
-        image2.output(file)
+      TileGeneration.renderMissingTiles("temperatures", temperatureOutputRoot, year, missingTiles) { tile =>
+        val image2 = Interaction.tile(lp, scale, tile.zoom, tile.x, tile.y)
+        // val image2 = Visualization2.visualizeGrid(grid, scale, tile.zoom, tile.x, tile.y)
+        image2
       }
     }
-  })
+  }
 
-  val baseYears = (for (year <- 1975 until 1990) yield year)
-    .filter(year => {
-      val file = new java.io.File(s"target/temperatures/$year/$maxZoom/$maxTile-$maxTile.png")
-      file.exists()
-    })
-    .map(year => {
-      val localTemp = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
-      println(s"Calculating averages: $year")
-      val localAvg = Extraction.locationYearlyAverageRecords(localTemp)
-      localAvg
-    })
+  if (enabledLayers.contains("deviations")) {
+    val missingDevYears = devYears.map(year => year -> TileGeneration.missingTiles(deviationOutputRoot, year, maxZoom))
+      .filter { case (_, missingTiles) => missingTiles.nonEmpty }
 
-  val devYears = for (year <- (2015 until 1989 by -1)) yield year
+    if (missingDevYears.nonEmpty) {
+      val baseYears = baselineYears
+        .filter(year => TileGeneration.missingTiles(temperatureOutputRoot, year, maxZoom).isEmpty)
+        .map(year => {
+          val localTemp = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
+          println(s"Calculating averages: $year")
+          Extraction.locationYearlyAverageRecords(localTemp)
+        })
 
-  val missingDevYears = devYears.filter(y => {
-    val file = new java.io.File(s"target/deviations/$y/$maxZoom/$maxTile-$maxTile.png")
-    !file.exists()
-  })
+      if (baseYears.nonEmpty) {
+        val normals = Manipulation.average(baseYears)
 
-  val normals = Manipulation.average(baseYears)
+        missingDevYears.foreach { case (year, missingTiles) =>
+          val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
+          val lp = Extraction.locationYearlyAverageRecords(l)
 
-  missingDevYears.foreach(year => {
-    val l = Extraction.locateTemperatures(year, "/stations.csv", s"/$year.csv")
-    val lp = Extraction.locationYearlyAverageRecords(l)
+          val deviations = Manipulation.deviation(lp, normals)
 
-    val deviations = Manipulation.deviation(lp, normals)
-
-    for (zoom <- 0 until (maxZoom + 1);
-         x <- 0 until math.pow(2, zoom).toInt;
-         y <- 0 until math.pow(2, zoom).toInt
-    ) {
-
-      val file = new java.io.File(s"target/deviations/$year/$zoom/$x-$y.png")
-
-      if (!file.exists()) {
-        println(s"Generating tile: $zoom - $x - $y")
-
-        val imgdev = Visualization2.visualizeGrid(deviations, scaled, zoom, x, y)
-
-        val folder = new java.io.File(s"target/deviations/$year/$zoom")
-
-        if (!folder.exists()) {
-          folder.mkdirs()
+          TileGeneration.renderMissingTiles("deviations", deviationOutputRoot, year, missingTiles) { tile =>
+            Visualization2.visualizeGrid(deviations, scaled, tile.zoom, tile.x, tile.y)
+          }
         }
-
-        imgdev.output(file)
+      } else {
+        println("Skipping deviations: no complete baseline temperature years were found.")
       }
     }
-  })
+  }
 }
