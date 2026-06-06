@@ -14,6 +14,10 @@ import Implicits._
 
 object JSMain {
 
+  private val MapHostId = "climate-observatory-map"
+  private val ControlsHostId = "climate-observatory-controls"
+  private val LegendHostId = "climate-observatory-legend"
+
   def main(args: Array[String]): Unit = main()
 
   def main(): Unit = {
@@ -22,13 +26,26 @@ object JSMain {
     val (sliderElement, selectedYear) = makeSlider(selectedLayer)
     val captionElement = makeCaptionElement(selectedLayer)
     setupMap(selectedLayer, selectedYear)
-    val app =
+    mountTag(
+      ControlsHostId,
       tags.div(
-        radioButtonElement,
-        sliderElement,
+        attrs.cls := "observatory-control-stack",
+        tags.div(
+          attrs.cls := "observatory-card observatory-card--controls",
+          tags.p(attrs.cls := "observatory-section-label")("Climate layers"),
+          radioButtonElement,
+          sliderElement
+        )
+      )
+    )
+    mountTag(
+      LegendHostId,
+      tags.div(
+        attrs.cls := "observatory-card observatory-card--legend",
+        tags.p(attrs.cls := "observatory-section-label")("Color scale"),
         captionElement
       )
-    document.body.appendChild(app.render)
+    )
     ()
   }
 
@@ -44,7 +61,7 @@ object JSMain {
       layer.setUrl(urlSignal())
     }
     map.addControl(L.control.zoom(ZoomOptions(position = "bottomright")))
-    document.body.appendChild(mapElement.render)
+    mountNode(MapHostId, mapElement)
     map.invalidateSize()
   }
 
@@ -52,30 +69,24 @@ object JSMain {
     val initialValue = availableLayers.head
     val radioButtonValue = Var[Layer](initialValue)
     def makeRadioButton(layer: Layer): Frag =
-      tags.input(
-        attrs.`type` := "radio",
-        attrs.name := "layer",
-        attrs.onclick := { (ev: Event) =>
-          val input = ev.target.asInstanceOf[Input]
-          if (input.checked) radioButtonValue() = layer
-        },
-        if (layer == initialValue) Some[Modifier](attrs.checked) else Option.empty[Modifier]
+      tags.label(
+        attrs.cls := "observatory-radio",
+        tags.input(
+          attrs.`type` := "radio",
+          attrs.name := "layer",
+          attrs.onclick := { (ev: Event) =>
+            val input = ev.target.asInstanceOf[Input]
+            if (input.checked) radioButtonValue() = layer
+          },
+          if (layer == initialValue) Some[Modifier](attrs.checked) else Option.empty[Modifier]
+        ),
+        tags.span(layer.layerName.toString)
       )
     val root =
       tags.div(
-        styles.position.absolute,
-        styles.top := 0,
-        styles.right := 0,
-        styles.left := 0,
-        styles.height := 2.em,
-        styles.zIndex := 1500
+        attrs.cls := "observatory-radio-group"
       )(
-        for (layer <- availableLayers) yield {
-          tags.label(
-            makeRadioButton(layer),
-            layer.layerName.toString
-          )
-        }
+        for (layer <- availableLayers) yield makeRadioButton(layer)
       )
     (root, radioButtonValue)
   }
@@ -101,21 +112,21 @@ object JSMain {
     val captionSignal = Interaction2.caption(selectedLayer, selectedYear)
 
     val caption = Signal {
-      tags.span(captionSignal())
+      tags.span(attrs.cls := "observatory-slider-value")(captionSignal())
     }
 
     val root =
       tags.div(
-        styles.position.absolute,
-        styles.bottom := 0,
-        styles.right := 0,
-        styles.left := 0,
-        styles.height := 2.em,
-        styles.zIndex := 1500
+        attrs.cls := "observatory-slider-group"
       )(
-        tags.label(
-          input,
+        tags.div(
+          attrs.cls := "observatory-slider-header",
+          tags.span(attrs.cls := "observatory-slider-label")("Year"),
           caption
+        ),
+        tags.label(
+          attrs.cls := "observatory-slider-control",
+          input
         )
       )
     (root, selectedYear)
@@ -124,28 +135,45 @@ object JSMain {
   def makeCaptionElement(selectedLayer: Signal[Layer]): Frag = {
     Signal {
       tags.div(
-        styles.position.absolute,
-        styles.top := 5.px,
-        styles.right := 5.px,
-        styles.zIndex := 1500,
-        styles.backgroundColor := "white"
+        attrs.cls := "observatory-legend-scale"
       )(
         for ((t, Color(red, green, blue)) <- selectedLayer().colorScale.reverse) yield {
           tags.div(
-            styles.margin := 5.px,
-            styles.textAlign.right
+            attrs.cls := "observatory-legend-row"
           )(
-            tags.span((if (t > 0) "+" else "") + t + " "),
+            tags.span(attrs.cls := "observatory-legend-value")((if (t > 0) "+" else "") + t + " "),
             tags.span(
-              styles.width := 20.px,
-              styles.height := 15.px,
+              attrs.cls := "observatory-legend-swatch",
               styles.backgroundColor := s"rgb($red, $green, $blue)",
-              styles.display.`inline-block`,
-              styles.border := "thin solid black"
+              styles.display.`inline-block`
             )
           )
         }
       )
+    }
+  }
+
+  private def mountTag(hostId: String, tag: Frag): Unit = {
+    mountNode(hostId, tag.render)
+  }
+
+  private def mountNode(hostId: String, node: Node): Unit = {
+    val host = resolveHost(hostId)
+    clearHost(host)
+    host.appendChild(node)
+  }
+
+  private def resolveHost(hostId: String): Element = {
+    Option(document.getElementById(hostId)).getOrElse {
+      val fallback = tags.div(attrs.id := hostId).render
+      document.body.appendChild(fallback)
+      fallback
+    }
+  }
+
+  private def clearHost(host: Element): Unit = {
+    while (host.firstChild != null) {
+      host.removeChild(host.firstChild)
     }
   }
 

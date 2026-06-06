@@ -1,34 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Climate Observatory</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07243b" />
+    <meta
+      name="description"
+      content="Interactive climate observatory with modernized shell, responsive map stage, and Scala.js powered climate layers."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0/dist/leaflet.css" />
-    <style>
-      * { box-sizing: border-box; }
-      html, body { height: 100%; margin: 0; padding: 0; }
-    </style>
+    <link rel="stylesheet" href="observatory-shell.css" />
+    <title>Climate Observatory | GlobalWarming</title>
   </head>
   <body>
+    <div class="observatory-shell">
+      <header class="observatory-topbar surface">
+        <div class="observatory-brand">
+          <p class="observatory-kicker">GlobalWarming Observatory</p>
+          <h1 class="observatory-title">A calmer, sharper shell for exploring climate signals.</h1>
+          <p class="observatory-subtitle">
+            The existing Scala.js explorer now sits inside a dedicated map stage, with responsive panels for
+            climate layers, year selection, and legend context.
+          </p>
+        </div>
+        <nav class="observatory-nav" aria-label="Primary">
+          <a href="index.html" data-active="true">Explorer</a>
+          <a href="interaction.html" data-active="false">2015 Surface</a>
+          <a href="interaction2.html" data-active="false">Layer Studio</a>
+        </nav>
+      </header>
+
+      <main class="observatory-layout">
+        <section class="surface observatory-stage">
+          <div class="observatory-stage__copy">
+            <p class="observatory-stage__eyebrow">Live Climate Layers</p>
+            <h2 class="observatory-stage__title">Move through years, swap layer families, and keep the map in focus.</h2>
+            <p class="observatory-stage__summary">
+              The visualization stage stays dominant while controls and legend move into dedicated shell hosts beside it.
+            </p>
+            <div class="observatory-stage__meta">
+              <span class="observatory-badge">Scala.js explorer</span>
+              <span class="observatory-badge">Leaflet map base</span>
+              <span class="observatory-badge">Static-host friendly</span>
+            </div>
+          </div>
+          <div class="observatory-map-frame">
+            <div id="climate-observatory-map" class="observatory-map-host" aria-label="Interactive climate map"></div>
+          </div>
+        </section>
+
+        <aside class="observatory-side">
+          <section class="surface observatory-panel">
+            <p class="observatory-panel__eyebrow">Explorer Focus</p>
+            <h2 class="observatory-panel__title">A shared shell, not a framework rewrite.</h2>
+            <p class="observatory-panel__body">
+              The page stays deployable as static HTML while the refreshed shell supplies typography, gradients,
+              spacing, and a stronger observatory identity around the existing browser logic.
+            </p>
+            <div class="observatory-stat-grid">
+              <div class="observatory-stat">
+                <span class="observatory-stat__label">Rendering</span>
+                <span class="observatory-stat__value">Leaflet + Scala.js</span>
+              </div>
+              <div class="observatory-stat">
+                <span class="observatory-stat__label">Controls</span>
+                <span class="observatory-stat__value">Hosted beside the stage</span>
+              </div>
+            </div>
+          </section>
+
+          <div id="climate-observatory-controls" class="observatory-slot" aria-live="polite"></div>
+
+          <div id="climate-observatory-legend" class="observatory-slot"></div>
+
+          <section class="surface observatory-panel">
+            <p class="observatory-panel__eyebrow">Page Routes</p>
+            <h2 class="observatory-panel__title">Browse the supporting views.</h2>
+            <p class="observatory-panel__body">
+              The refreshed entry pages now feel like one product instead of separate assignment snapshots.
+            </p>
+            <div class="observatory-link-row">
+              <a class="observatory-link-pill" href="interaction.html">Open the 2015 snapshot</a>
+              <a class="observatory-link-pill" href="interaction2.html">Open layer studio</a>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="observatory-footer surface">
+        <div>
+          <p class="observatory-footer__eyebrow">Deployment</p>
+          <p class="observatory-footer__body">Relative assets remain intact: Leaflet loads from CDN, and the Scala.js bundle stays in the project target tree.</p>
+        </div>
+        <span class="observatory-badge">Bundle: capstoneui-fastopt/main.js</span>
+      </footer>
+    </div>
+
     <script src="https://npmcdn.com/leaflet@1.0.0/dist/leaflet.js"></script>
-    <script src="capstone-ui/target/scala-2.11/capstoneui-fastopt.js"></script>
+    <script src="capstone-ui/target/scala-2.12/capstoneui-fastopt/main.js"></script>
 
     <!-- Matomo -->
     <script type="text/javascript">
-    var _paq = window._paq = window._paq || [];
-    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-    _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
-    _paq.push(["setCookieDomain", "*.jahnog.github.io"]);
-    _paq.push(["setDomains", ["*.jahnog.github.io"]]);
-    _paq.push(['trackPageView']);
-    _paq.push(['enableLinkTracking']);
-    (function() {
-      var u="https://contentlabstudy.com/Mat0mo/";
-      _paq.push(['setTrackerUrl', u+'matomo.php']);
-      _paq.push(['setSiteId', '4']);
-      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-      g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-    })();
-  </script>
+      var _paq = window._paq = window._paq || [];
+      _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+      _paq.push(["setCookieDomain", "*.jahnog.github.io"]);
+      _paq.push(["setDomains", ["*.jahnog.github.io"]]);
+      _paq.push(["trackPageView"]);
+      _paq.push(["enableLinkTracking"]);
+      (function() {
+        var u = "https://contentlabstudy.com/Mat0mo/";
+        _paq.push(["setTrackerUrl", u + "matomo.php"]);
+        _paq.push(["setSiteId", "4"]);
+        var d = document, g = d.createElement("script"), s = d.getElementsByTagName("script")[0];
+        g.type = "text/javascript";
+        g.async = true;
+        g.src = u + "matomo.js";
+        s.parentNode.insertBefore(g, s);
+      })();
+    </script>
     <noscript><p><img src="https://contentlabstudy.com/Mat0mo/matomo.php?idsite=4&amp;rec=1" style="border:0;" alt="" /></p></noscript>
     <!-- End Matomo Code -->
   </body>

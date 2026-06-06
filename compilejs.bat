@@ -1,1 +1,1 @@
-sbt capstoneUI/fastOptJS
+sbt capstoneUI/fastLinkJS

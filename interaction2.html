@@ -1,34 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Climate Observatory</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07243b" />
+    <meta
+      name="description"
+      content="Layer studio view for the climate observatory, using the shared shell and Scala.js climate controls."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0/dist/leaflet.css" />
-    <style>
-      * { box-sizing: border-box; }
-      html, body { height: 100%; margin: 0; padding: 0; }
-    </style>
+    <link rel="stylesheet" href="observatory-shell.css" />
+    <title>Layer Studio | Climate Observatory</title>
   </head>
   <body>
+    <div class="observatory-shell">
+      <header class="observatory-topbar surface">
+        <div class="observatory-brand">
+          <p class="observatory-kicker">GlobalWarming Observatory</p>
+          <h1 class="observatory-title">A dedicated studio view for tuning climate layers.</h1>
+          <p class="observatory-subtitle">
+            This route keeps the same interactive engine as the explorer while giving the controls and legend more room
+            to read as a focused analysis panel.
+          </p>
+        </div>
+        <nav class="observatory-nav" aria-label="Primary">
+          <a href="index.html" data-active="false">Explorer</a>
+          <a href="interaction.html" data-active="false">2015 Surface</a>
+          <a href="interaction2.html" data-active="true">Layer Studio</a>
+        </nav>
+      </header>
+
+      <main class="observatory-layout">
+        <section class="surface observatory-stage">
+          <div class="observatory-stage__copy">
+            <p class="observatory-stage__eyebrow">Layer Studio</p>
+            <h2 class="observatory-stage__title">Switch datasets and years while the map stays anchored.</h2>
+            <p class="observatory-stage__summary">
+              The stage is identical in behavior to the explorer, but the surrounding copy focuses on the layer and
+              legend reading workflow.
+            </p>
+            <div class="observatory-stage__meta">
+              <span class="observatory-badge">Responsive panel stack</span>
+              <span class="observatory-badge">Shared shell tokens</span>
+            </div>
+          </div>
+          <div class="observatory-map-frame">
+            <div id="climate-observatory-map" class="observatory-map-host" aria-label="Interactive layer studio map"></div>
+          </div>
+        </section>
+
+        <aside class="observatory-side">
+          <section class="surface observatory-panel">
+            <p class="observatory-panel__eyebrow">Analysis Workflow</p>
+            <h2 class="observatory-panel__title">Controls, year slider, and legend stay in one readable column.</h2>
+            <p class="observatory-panel__body">
+              Moving the dynamic controls out of body-level absolute positioning makes the interface easier to scan and
+              more predictable across screen sizes.
+            </p>
+          </section>
+
+          <div id="climate-observatory-controls" class="observatory-slot" aria-live="polite"></div>
+
+          <div id="climate-observatory-legend" class="observatory-slot"></div>
+
+          <section class="surface observatory-panel">
+            <p class="observatory-panel__eyebrow">Companion Pages</p>
+            <div class="observatory-link-row">
+              <a class="observatory-link-pill" href="index.html">Return to explorer</a>
+              <a class="observatory-link-pill" href="interaction.html">Open 2015 surface</a>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="observatory-footer surface">
+        <div>
+          <p class="observatory-footer__eyebrow">Integration</p>
+          <p class="observatory-footer__body">The page still loads the same Scala.js bundle and Leaflet runtime, but now through stable shell host regions.</p>
+        </div>
+        <span class="observatory-badge">Shared observatory shell</span>
+      </footer>
+    </div>
+
     <script src="https://npmcdn.com/leaflet@1.0.0/dist/leaflet.js"></script>
-    <script src="capstone-ui/target/scala-2.11/capstoneui-fastopt.js"></script>
+    <script src="capstone-ui/target/scala-2.12/capstoneui-fastopt/main.js"></script>
 
     <!-- Matomo -->
     <script type="text/javascript">
-    var _paq = window._paq = window._paq || [];
-    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-    _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
-    _paq.push(["setCookieDomain", "*.jahnog.github.io"]);
-    _paq.push(["setDomains", ["*.jahnog.github.io"]]);
-    _paq.push(['trackPageView']);
-    _paq.push(['enableLinkTracking']);
-    (function() {
-      var u="https://contentlabstudy.com/Mat0mo/";
-      _paq.push(['setTrackerUrl', u+'matomo.php']);
-      _paq.push(['setSiteId', '4']);
-      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-      g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-    })();
-  </script>
+      var _paq = window._paq = window._paq || [];
+      _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+      _paq.push(["setCookieDomain", "*.jahnog.github.io"]);
+      _paq.push(["setDomains", ["*.jahnog.github.io"]]);
+      _paq.push(["trackPageView"]);
+      _paq.push(["enableLinkTracking"]);
+      (function() {
+        var u = "https://contentlabstudy.com/Mat0mo/";
+        _paq.push(["setTrackerUrl", u + "matomo.php"]);
+        _paq.push(["setSiteId", "4"]);
+        var d = document, g = d.createElement("script"), s = d.getElementsByTagName("script")[0];
+        g.type = "text/javascript";
+        g.async = true;
+        g.src = u + "matomo.js";
+        s.parentNode.insertBefore(g, s);
+      })();
+    </script>
     <noscript><p><img src="https://contentlabstudy.com/Mat0mo/matomo.php?idsite=4&amp;rec=1" style="border:0;" alt="" /></p></noscript>
     <!-- End Matomo Code -->
   </body>

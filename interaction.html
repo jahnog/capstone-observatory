@@ -1,58 +1,130 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07243b" />
+    <meta
+      name="description"
+      content="Historic 2015 climate surface view with a modernized observatory shell and responsive Leaflet stage."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="observatory-shell.css" />
+    <title>2015 Surface | Climate Observatory</title>
+  </head>
+  <body>
+    <div class="observatory-shell">
+      <header class="observatory-topbar surface">
+        <div class="observatory-brand">
+          <p class="observatory-kicker">GlobalWarming Observatory</p>
+          <h1 class="observatory-title">A cleaner snapshot view for the 2015 surface layer.</h1>
+          <p class="observatory-subtitle">
+            This route keeps the focused single-layer experience, but presents it inside the same climate observatory
+            shell as the interactive explorer.
+          </p>
+        </div>
+        <nav class="observatory-nav" aria-label="Primary">
+          <a href="index.html" data-active="false">Explorer</a>
+          <a href="interaction.html" data-active="true">2015 Surface</a>
+          <a href="interaction2.html" data-active="false">Layer Studio</a>
+        </nav>
+      </header>
 
-<head>
-  <title>Climate Observatory</title>
-  <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0/dist/leaflet.css" />
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+      <main class="observatory-layout">
+        <section class="surface observatory-stage">
+          <div class="observatory-stage__copy">
+            <p class="observatory-stage__eyebrow">Historic Snapshot</p>
+            <h2 class="observatory-stage__title">Mean temperatures for 2015, with the map still front and center.</h2>
+            <p class="observatory-stage__summary">
+              The viewport now has breathing room for context without forcing the map to collapse beneath page chrome.
+            </p>
+            <div class="observatory-stage__meta">
+              <span class="observatory-badge">OpenStreetMap base</span>
+              <span class="observatory-badge">2015 temperature tiles</span>
+            </div>
+          </div>
+          <div class="observatory-map-frame">
+            <div id="climate-observatory-static-map" class="observatory-map-host" aria-label="2015 temperature surface map"></div>
+          </div>
+        </section>
 
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-  </style>
-</head>
+        <aside class="observatory-side">
+          <section class="surface observatory-panel">
+            <p class="observatory-panel__eyebrow">What Changed</p>
+            <h2 class="observatory-panel__title">The map now lives in a dedicated stage host.</h2>
+            <p class="observatory-panel__body">
+              Instead of injecting a full-page map directly into the body, this page mounts the Leaflet surface into a
+              stable layout region that works on large and narrow screens.
+            </p>
+          </section>
 
-<body>
-  <script src="https://npmcdn.com/leaflet@1.0.0/dist/leaflet.js"></script>
-  <script>
-    var mapElement = document.createElement("div");
-    mapElement.setAttribute("style", "height: 100%;");
-    var map = L.map(mapElement, { zoomControl: false, maxZoom: 3 });
-    map.setView(L.latLng(48.0, 14.0), 3);
-    // L.tileLayer("http://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png").addTo(map);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-    L.tileLayer("target/temperatures/2015/{z}/{x}-{y}.png").addTo(map);
-    map.addControl(L.control.zoom({ position: "bottomright" }));
-    document.body.appendChild(mapElement);
-    map.invalidateSize();
-  </script>
-  <!-- Matomo -->
-  <script type="text/javascript">
-    var _paq = window._paq = window._paq || [];
-    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-    _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
-    _paq.push(["setCookieDomain", "*.jahnog.github.io"]);
-    _paq.push(["setDomains", ["*.jahnog.github.io"]]);
-    _paq.push(['trackPageView']);
-    _paq.push(['enableLinkTracking']);
-    (function() {
-      var u="https://contentlabstudy.com/Mat0mo/";
-      _paq.push(['setTrackerUrl', u+'matomo.php']);
-      _paq.push(['setSiteId', '4']);
-      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-      g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-    })();
-  </script>
-  <noscript><p><img src="https://contentlabstudy.com/Mat0mo/matomo.php?idsite=4&amp;rec=1" style="border:0;" alt="" /></p></noscript>
-  <!-- End Matomo Code -->
-</body>
+          <section class="surface observatory-panel">
+            <p class="observatory-panel__eyebrow">Reading the Surface</p>
+            <ul class="observatory-list">
+              <li>Use the lower-right zoom controls to move from globe to regional view.</li>
+              <li>The raster overlay comes from the generated temperature tiles in `target/temperatures/2015/`.</li>
+              <li>Attribution and analytics remain in place for the static-host deployment flow.</li>
+            </ul>
+          </section>
 
+          <section class="surface observatory-panel">
+            <p class="observatory-panel__eyebrow">Next Views</p>
+            <div class="observatory-link-row">
+              <a class="observatory-link-pill" href="index.html">Back to explorer</a>
+              <a class="observatory-link-pill" href="interaction2.html">Open layer studio</a>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="observatory-footer surface">
+        <div>
+          <p class="observatory-footer__eyebrow">Static Hosting</p>
+          <p class="observatory-footer__body">This view remains a plain HTML page with relative tile paths and no client-side router.</p>
+        </div>
+        <span class="observatory-badge">Leaflet stage host</span>
+      </footer>
+    </div>
+
+    <script src="https://npmcdn.com/leaflet@1.0.0/dist/leaflet.js"></script>
+    <script>
+      var mapHost = document.getElementById("climate-observatory-static-map");
+      var map = L.map(mapHost, { zoomControl: false, minZoom: 0, maxZoom: 3 });
+      map.setView(L.latLng(48.0, 14.0), 3);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      L.tileLayer("target/temperatures/2015/{z}/{x}-{y}.png").addTo(map);
+      map.addControl(L.control.zoom({ position: "bottomright" }));
+      map.invalidateSize();
+    </script>
+
+    <!-- Matomo -->
+    <script type="text/javascript">
+      var _paq = window._paq = window._paq || [];
+      _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+      _paq.push(["setCookieDomain", "*.jahnog.github.io"]);
+      _paq.push(["setDomains", ["*.jahnog.github.io"]]);
+      _paq.push(["trackPageView"]);
+      _paq.push(["enableLinkTracking"]);
+      (function() {
+        var u = "https://contentlabstudy.com/Mat0mo/";
+        _paq.push(["setTrackerUrl", u + "matomo.php"]);
+        _paq.push(["setSiteId", "4"]);
+        var d = document, g = d.createElement("script"), s = d.getElementsByTagName("script")[0];
+        g.type = "text/javascript";
+        g.async = true;
+        g.src = u + "matomo.js";
+        s.parentNode.insertBefore(g, s);
+      })();
+    </script>
+    <noscript><p><img src="https://contentlabstudy.com/Mat0mo/matomo.php?idsite=4&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+    <!-- End Matomo Code -->
+  </body>
 </html>
