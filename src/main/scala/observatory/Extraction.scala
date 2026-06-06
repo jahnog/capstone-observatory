@@ -1,6 +1,8 @@
 package observatory
 
+import java.io.InputStream
 import java.time.LocalDate
+import java.util.zip.GZIPInputStream
 
 import scala.io.{BufferedSource}
 
@@ -10,16 +12,33 @@ import scala.io.{BufferedSource}
 object Extraction {
 
   /**
+    * Opens a resource as an InputStream, preferring a gzip-compressed sibling
+    * (logicalPath + ".gz") when present for on-the-fly decompression via GZIPInputStream.
+    * Falls back to the plain logicalPath if no .gz variant exists.
+    * Returns null if neither resource is found (preserves prior missing-resource behavior).
+    */
+  private def openResourceStream(logicalPath: String): InputStream = {
+    val gzPath = logicalPath + ".gz"
+    val gzIn = getClass().getResourceAsStream(gzPath)
+    if (gzIn != null) {
+      new GZIPInputStream(gzIn)
+    } else {
+      getClass().getResourceAsStream(logicalPath)
+    }
+  }
+
+  /**
     * @param year             Year number
-    * @param stationsFile     Path of the stations resource file to use (e.g. "/stations.csv")
-    * @param temperaturesFile Path of the temperatures resource file to use (e.g. "/1975.csv")
+    * @param stationsFile     Path of the stations resource file to use (e.g. "/stations.csv").
+    *                         Both plain "/stations.csv" and compressed "/stations.csv.gz" are supported;
+    *                         the loader transparently prefers the .gz variant when present for the same logical name.
+    * @param temperaturesFile Path of the temperatures resource file to use (e.g. "/1975.csv").
+    *                         Both plain and .gz forms are supported (transparent dual-mode).
     * @return A sequence containing triplets (date, location, temperature)
     */
   def locateTemperatures(year: Int, stationsFile: String, temperaturesFile: String): Iterable[(LocalDate, Location, Double)] = {
 
-    println(s"Extracting from: $temperaturesFile")
-
-    val stationsReader = new BufferedSource(getClass().getResourceAsStream(stationsFile))
+    val stationsReader = new BufferedSource(openResourceStream(stationsFile))
 
     if (stationsReader == null) {
       Iterable[(LocalDate, Location, Double)]()
@@ -44,7 +63,7 @@ object Extraction {
     stationsReader.close()
 
     println(s"Stations count: ${allStations.size}")
-    val tempReader = new BufferedSource(getClass().getResourceAsStream(temperaturesFile))
+    val tempReader = new BufferedSource(openResourceStream(temperaturesFile))
     val allTemps = tempReader
       .getLines()
       .map(str => {
