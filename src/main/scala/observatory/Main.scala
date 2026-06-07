@@ -6,8 +6,9 @@ import scala.util.Try
 
 object Main extends App {
 
-  private val defaultTemperatureYears = (for (year <- (2015 until 1974 by -1)) yield year)
-    .filter(year => (year % 2) == 1)
+  ProcessPriority.ensureLowPriority()
+
+  private val defaultTemperatureYears = for (year <- (2015 until 1974 by -1)) yield year
 
   private val defaultDeviationYears = for (year <- (2015 until 1989 by -1)) yield year
 

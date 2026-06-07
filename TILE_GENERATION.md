@@ -1,6 +1,8 @@
 ## Low-priority tile generation
 
-Use `./generate-tiles-low-priority.sh` for server rebuilds. The script wraps `sbt "runMain observatory.Main"` with `nice` and, when available, `ionice` so the generator yields CPU and disk priority to the rest of the host.
+Use `./generate-tiles-low-priority.sh` for server rebuilds. The script wraps `sbt "runMain observatory.Main"` with both `ionice` and `nice` so the generator yields CPU and disk priority to the rest of the host.
+
+Direct Linux launches of `sbt "runMain observatory.Main"` also re-exec the tile-generation JVM under the same low-priority settings, so the entrypoint does not continue at normal priority if the wrapper is bypassed.
 
 The generator still writes the same default layout under `target/temperatures/<year>/<zoom>/<x>-<y>.png` and `target/deviations/<year>/<zoom>/<x>-<y>.png`.
 
@@ -35,4 +37,4 @@ TILE_GENERATION_MAX_ZOOM=0 \
 - `TILE_GENERATION_NICE_LEVEL`: niceness value passed to `nice`. Defaults to `15`.
 - `TILE_GENERATION_IONICE_CLASS`: `ionice` class passed to the launcher. Defaults to `3` for idle I/O scheduling.
 
-If `ionice` is unavailable, the launcher prints a notice and continues with `nice` only.
+If either `nice` or `ionice` is unavailable, the launcher fails fast because it cannot guarantee the required low-priority execution profile.
