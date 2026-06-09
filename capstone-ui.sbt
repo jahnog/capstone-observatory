@@ -1,5 +1,3 @@
-import StudentBuild._
-
 lazy val capstoneUI =
   project.in(file("capstone-ui"))
     .enablePlugins(ScalaJSPlugin)

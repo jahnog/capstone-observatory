@@ -1,9 +1,20 @@
-.idea/libraries/
-.idea/sonarlint/
-.metals/
-.bloop/
-metals.sbt
-
+# Build output
 target/
 project/target/
 project/project/target/
+
+# IDE / editor
+.idea/
+.vscode/
+.metals/
+.bloop/
+.history/
+metals.sbt
+
+# AI tooling configs
+.claude/
+.codex/
+.cursor/
+.gemini/
+.opencode/
+.continue/

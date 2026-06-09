@@ -5,36 +5,6 @@ package observatory
   */
 object Manipulation {
 
-  def makeGridTree(temperatures: Iterable[(Location, Double)]): (Int, Int) => Double = {
-
-    println( "Creating KDTree")
-    val points = temperatures.map(t => {
-      KDTree.KDPoint(Seq(t._1.lat, t._1.lon), t._2)
-    }).toSeq
-
-    val tree = KDTree(points)
-    println( "KDTree created")
-
-    def calculate(latitud: Int, longitud: Int): Double = {
-      val loc = Location(latitud, longitud)
-      tree match {
-        case Some(x) => {
-          val node = x.nearest(Seq(latitud, longitud))
-          val temp1 = node.value.data
-//          val temps = List((Location(node.value.dimensions(0), node.value.dimensions(1)), node.value.data))
-//          val temp1 = Visualization.predictTemperature(temps, loc)
-          temp1
-        }
-        case None => {
-          val temp1 = Visualization.predictTemperature(temperatures, loc)
-          temp1
-        }
-      }
-    }
-
-    calculate
-  }
-
   /**
     * @param temperatures Known temperatures
     * @return A function that, given a latitude in [-89, 90] and a longitude in [-180, 179],
