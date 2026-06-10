@@ -53,7 +53,7 @@ object Interaction {
     val pixels = Array.fill[Pixel](256 * 256)(Pixel(0, 0, 0, 127))
 
     print(s"Tile 256: ")
-    for (y <- (0 until 256).par) {
+    for (y <- ProcessPriority.limitedParRange(0 until 256)) {
 
       print(".")
       for (x <- 0 until 256) {
@@ -83,7 +83,7 @@ object Interaction {
     val pixels = Array.fill[Pixel](tileSize * tileSize)(Pixel(0, 0, 0, 127))
 
     print(s"Tile $tileSize: ")
-    for (y <- (0 until tileSize).par) {
+    for (y <- ProcessPriority.limitedParRange(0 until tileSize)) {
 
       print(".")
       for (x <- 0 until tileSize) {

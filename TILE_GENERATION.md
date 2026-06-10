@@ -1,8 +1,8 @@
 ## Low-priority tile generation
 
-Use `./generate-tiles-low-priority.sh` for server rebuilds. The script wraps `sbt "runMain observatory.Main"` with both `ionice` and `nice` so the generator yields CPU and disk priority to the rest of the host.
+Use `./generate-tiles-low-priority.sh` for workstation or server rebuilds. The script wraps `sbt "runMain observatory.Main"` with `ionice`, `nice`, and JVM CPU limits so the generator yields CPU and disk priority to the rest of the host.
 
-Direct Linux launches of `sbt "runMain observatory.Main"` also re-exec the tile-generation JVM under the same low-priority settings, so the entrypoint does not continue at normal priority if the wrapper is bypassed.
+Direct Linux launches of `sbt "runMain observatory.Main"` also re-exec the tile-generation JVM under the same low-priority settings when the wrapper is bypassed. Once the JVM starts, it additionally applies `renice` and `ionice` to its own process, caps parallel tile work to a small thread pool, and yields between tiles so the desktop stays responsive.
 
 The generator still writes the same default layout under `target/temperatures/<year>/<zoom>/<x>-<y>.png` and `target/deviations/<year>/<zoom>/<x>-<y>.png`.
 
@@ -34,7 +34,10 @@ TILE_GENERATION_MAX_ZOOM=0 \
 - `TILE_GENERATION_DEVIATION_YEARS`: comma-separated years for deviation tiles. Set to an empty string to skip them.
 - `TILE_GENERATION_BASELINE_YEARS`: comma-separated baseline years used to compute normals for deviations.
 - `TILE_GENERATION_MAX_ZOOM`: highest zoom level to generate.
-- `TILE_GENERATION_NICE_LEVEL`: niceness value passed to `nice`. Defaults to `15`.
+- `TILE_GENERATION_NICE_LEVEL`: niceness value passed to `nice` and `renice`. Defaults to `15`.
 - `TILE_GENERATION_IONICE_CLASS`: `ionice` class passed to the launcher. Defaults to `3` for idle I/O scheduling.
+- `TILE_GENERATION_IONICE_LEVEL`: `ionice` level for classes `0`, `1`, and `2`. Defaults to `7`.
+- `TILE_GENERATION_MAX_THREADS`: maximum worker threads used by parallel tile/grid code and `-XX:ActiveProcessorCount`. Defaults to `2`.
+- `TILE_GENERATION_TILE_DELAY_MS`: optional sleep between tiles in milliseconds. Defaults to disabled; `Thread.yield()` still runs after every tile.
 
-If either `nice` or `ionice` is unavailable, the launcher fails fast because it cannot guarantee the required low-priority execution profile.
+If `nice`, `ionice`, or `renice` is unavailable, the launcher fails fast because it cannot guarantee the required low-priority execution profile.

@@ -46,7 +46,7 @@ object Manipulation {
 
     print("Preparation to make grid")
     //    if (!Speed.slow) {
-    for (y <- (0 until 180).par) {
+    for (y <- ProcessPriority.limitedParRange(0 until 180)) {
       print(".")
       for (x <- 0 until 360) {
         val latitud = 90 - y
@@ -121,7 +121,7 @@ object Manipulation {
     println("")
 
     print(s"Pre calculating averages")
-    for (y <- (0 until 180).par) {
+    for (y <- ProcessPriority.limitedParRange(0 until 180)) {
       print(".")
       for (x <- 0 until 360) {
         val acum = grids.foldLeft(0.0)((ac, grid) => {
@@ -181,7 +181,7 @@ object Manipulation {
 
     print(s"Pre calculating deviations: ")
 
-    for (y <- (0 until 180).par) {
+    for (y <- ProcessPriority.limitedParRange(0 until 180)) {
       print(".")
       for (x <- 0 until 360) {
         val latitud = 90 - y

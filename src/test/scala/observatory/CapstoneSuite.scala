@@ -12,4 +12,5 @@ class CapstoneSuite
     with Visualization2Test
     with Interaction2Test
     with TileGenerationTest
+    with ProcessPriorityTest
 

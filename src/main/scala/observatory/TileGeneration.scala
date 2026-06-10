@@ -48,6 +48,8 @@ object TileGeneration {
       if ((index + 1) == tiles.size || ((index + 1) % 10) == 0) {
         println(s"Progress $layerName $year: ${index + 1}/${tiles.size} tiles")
       }
+
+      ProcessPriority.yieldBetweenTiles()
     }
   }
 
